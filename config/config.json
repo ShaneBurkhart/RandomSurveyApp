@@ -1,0 +1,14 @@
+{
+  "development": {
+    "url": "mysql://root:password@mysql:3306/mydb",
+    "dialect": "mysql"
+  },
+  "test": {
+    "url": "mysql://root:password@mysql:3306/mydb",
+    "dialect": "mysql"
+  },
+  "production": {
+    "url": "mysql://root:password@mysql:3306/mydb",
+    "dialect": "mysql"
+  }
+}
