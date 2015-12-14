@@ -23,7 +23,10 @@ logs:
 	docker-compose logs
 
 c:
-	docker-compose run web /bin/bash
+	docker-compose run --rm web /bin/bash
+
+test: migrate
+	docker-compose run --rm web npm test
 
 migrate: start
 	docker-compose run web npm run sequelize db:migrate
