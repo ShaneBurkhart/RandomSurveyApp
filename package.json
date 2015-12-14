@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "An app that presents a random survey question to the user.",
   "scripts": {
-    "sequelize": "sequelize"
+    "sequelize": "sequelize",
+    "jasmine": "jasmine"
   },
   "author": "Shane Burkhart",
   "dependencies": {
@@ -12,6 +13,7 @@
     "sequelize": "^3.14.2"
   },
   "devDependencies": {
+    "jasmine": "^2.4.1",
     "sequelize-cli": "^2.2.1",
     "umzug": "^1.7.1"
   }
