@@ -24,3 +24,20 @@ logs:
 
 c:
 	docker-compose run web /bin/bash
+
+migrate: start
+	docker-compose run web npm run sequelize db:migrate
+
+migration:
+ifdef NAME
+	npm run sequelize -- migration:create --name="${NAME}"
+else
+	echo "No NAME variable given for the migration."
+endif
+
+model:
+ifdef NAME
+	npm run sequelize -- model:create --name="${NAME}" --attributes="${ATTRS}"
+else
+	echo "No NAME variable given for the model."
+endif
