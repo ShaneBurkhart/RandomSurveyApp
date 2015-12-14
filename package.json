@@ -4,7 +4,8 @@
   "description": "An app that presents a random survey question to the user.",
   "scripts": {
     "sequelize": "sequelize",
-    "jasmine": "jasmine"
+    "jasmine": "jasmine",
+    "test": "jasmine"
   },
   "author": "Shane Burkhart",
   "dependencies": {
