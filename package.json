@@ -1,0 +1,8 @@
+{
+  "name": "random-survey-app",
+  "version": "1.0.0",
+  "description": "An app that presents a random survey question to the user.",
+  "scripts": {
+  },
+  "author": "Shane Burkhart",
+}
