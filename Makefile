@@ -11,7 +11,7 @@ start:
 restart: clean start
 
 stop:
-	docker stop $$(docker ps -aq)
+	docker stop $$(docker ps -q)
 
 clean: stop
 	docker rm $$(docker ps -aq)
