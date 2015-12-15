@@ -25,6 +25,9 @@ logs:
 c:
 	docker-compose run --rm web /bin/bash
 
+mysql: migrate
+	docker-compose run --rm mysql mysql --user=root --password=password --host=mysql --database=mydb
+
 test: migrate
 	docker-compose run --rm web npm test
 
