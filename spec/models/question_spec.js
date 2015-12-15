@@ -1,9 +1,9 @@
 'use strict'
 
 var db = require('../../models/db.js');
-var Question = db['Question'];
+var Question = db.question;
 
-describe('question', function() {
+describe('Question', function() {
   it('saves a record correctly', function(done) {
     var question = Question.build({
       question: 'What is your name?'
