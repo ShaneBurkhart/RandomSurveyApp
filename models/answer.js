@@ -8,6 +8,9 @@ module.exports = function(sequelize, DataTypes) {
         notEmpty: true
       }
     },
+    timesAnswered: {
+      type: DataTypes.INTEGER
+    },
     questionId: {
       type: DataTypes.INTEGER,
       validate: {

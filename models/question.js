@@ -7,6 +7,9 @@ module.exports = function(sequelize, DataTypes) {
       validate: {
         notEmpty: true
       }
+    },
+    timesAnswered: {
+      type: DataTypes.INTEGER
     }
   }, {
     classMethods: {
