@@ -1,0 +1,42 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300,100);
+
+html, body {
+    font-family: Roboto, Arial, Sans-Serif;
+    background-color: #eeeeee;
+    background-image: url("/img/background.png");
+    background-repeat: repeat;
+}
+
+h1, h2, h3, h4, h5 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+h2 {
+    font-weight: 300;
+}
+
+.card {
+    background-color: #ffffff;
+    width: 700px;
+    padding: 30px;
+    margin: 50px auto 0;
+    border: 1px solid #cccccc;
+    box-shadow: 2px 2px 5px #bbbbbb;
+}
+
+.answers {
+    border-top: 1px solid #cccccc;
+
+    p {
+        border-bottom: 1px solid #cccccc;
+        padding: 15px 13px;
+        margin: 0;
+
+        &:hover {
+            background-color: #f3f3f3;
+            cursor: pointer;
+        }
+    }
+}

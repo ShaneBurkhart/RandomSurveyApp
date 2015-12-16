@@ -1,0 +1,11 @@
+extends /layout.jade
+
+block content
+    .card
+        if question
+                h2= question.question
+                .answers(data-qid="#{question.id}")
+                    each a, i in question.answers
+                        p(data-aid="#{a.id}") #{i+1}. #{a.answer}
+        else
+            h2 There aren't anymore survey questions.  
