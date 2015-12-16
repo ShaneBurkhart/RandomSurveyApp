@@ -7,6 +7,7 @@ var QuestionController = require('./controllers/question.js');
 var app = express();
 
 app.set('view engine', 'jade');
+app.set('views', __dirname + '/templates');
 
 app.get('/', QuestionController.show);
 
