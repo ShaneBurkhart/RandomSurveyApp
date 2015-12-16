@@ -5,10 +5,12 @@
   "scripts": {
     "sequelize": "sequelize",
     "jasmine": "jasmine",
-    "test": "jasmine"
+    "test": "jasmine",
+    "bower": "bower"
   },
   "author": "Shane Burkhart",
   "dependencies": {
+    "bower": "^1.7.1",
     "express": "^4.13.3",
     "jade": "^1.11.0",
     "mysql": "^2.9.0",
