@@ -7,7 +7,7 @@
     "jasmine": "jasmine",
     "test": "jasmine",
     "bower": "bower",
-    "gulp": "gulpe"
+    "gulp": "gulp"
   },
   "author": "Shane Burkhart",
   "dependencies": {
