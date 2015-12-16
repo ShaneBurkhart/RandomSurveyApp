@@ -1,0 +1,20 @@
+{
+  "name": "random-survey-app",
+  "description": "An app that presents a random survey question to the user.",
+  "main": "",
+  "authors": [
+    "Shane Burkhart"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/ShaneBurkhart/RandomSurveyApp",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "spec"
+  ]
+}
