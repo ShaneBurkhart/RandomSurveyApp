@@ -11,4 +11,4 @@ app.set('views', __dirname + '/templates');
 
 app.get('/', QuestionController.show);
 
-http.createServer(app).listen(3000);
+http.createServer(app).listen(process.env.PORT);
