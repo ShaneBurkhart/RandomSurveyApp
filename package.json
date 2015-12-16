@@ -11,6 +11,7 @@
   },
   "author": "Shane Burkhart",
   "dependencies": {
+    "body-parser": "^1.14.1",
     "bower": "^1.7.1",
     "cookie-parser": "^1.4.0",
     "express": "^4.13.3",
