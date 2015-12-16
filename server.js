@@ -2,6 +2,7 @@
 
 var express = require('express');
 var cookieParser = require('cookie-parser')
+var bodyParser = require('body-parser');
 var http = require('http');
 var path = require('path');
 var QuestionController = require('./controllers/question.js');
@@ -14,6 +15,8 @@ app.set('views', templateDir);
 app.locals.basedir = templateDir;
 
 app.use(cookieParser());
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 app.get('/', QuestionController.show);
 
