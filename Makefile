@@ -28,7 +28,7 @@ c:
 mysql: migrate
 	docker-compose run --rm mysql mysql --user=root --password=password --host=mysql --database=mydb
 
-test: migrate
+test:
 	docker-compose run --rm web npm test
 
 migrate: start
