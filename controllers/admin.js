@@ -105,6 +105,7 @@ var AdminController = {
 
     Admin.findOne({ where: { email: email } }).then(function(a) {
       if(a && a.comparePassword(password)) {
+        req.session.adminId = a.id;
         res.redirect('/admin/questions');
       } else {
         res.render('admin/login', { admin: a });

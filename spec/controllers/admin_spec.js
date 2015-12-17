@@ -232,7 +232,10 @@ describe('AdminController', function() {
 
     it('logs in and redirects with correct credentials', function(done) {
       var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse(null, 302, '/admin/questions', null, done);
+      var mockResponse = createMockResponse(null, 302, '/admin/questions', null, function() {
+        expect(mockRequest.session.adminId).not.toBeUndefined();
+        done();
+      });
 
       mockRequest.body.email = 'user@example.com'
       mockRequest.body.password = 'password'
