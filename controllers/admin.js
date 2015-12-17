@@ -23,7 +23,6 @@ var AdminController = {
   },
 
   create: function(req, res) {
-    // POST for new.  Creates both questions and answers.
     var question = req.body.question;
     var questionText = getQuestionText(question);
     var answers = getAnswers(question);
@@ -46,7 +45,7 @@ var AdminController = {
     // Show edit of question.  On that page, there will be answer editing.
     var questionId = req.params.id;
 
-    Question.findById(questionId, { include: [db.answer] }).then(function(question) {
+    Question.findById(questionId, { include: [Answer] }).then(function(question) {
       if(question) {
         res.render('admin/edit', {
           question: question
@@ -58,7 +57,34 @@ var AdminController = {
   },
 
   update: function(req, res) {
-    // POST update for edit.  Updates both questions and answers.
+    var questionId = req.params.id;
+    var question = req.body.question;
+    var questionText = getQuestionText(question);
+    var answers = getAnswers(question);
+
+    if(!question || !questionText || !answers.length) {
+      res.render('admin/edit', {
+        question: question
+      });
+      return;
+    }
+
+    Question.findById(questionId, { include: [Answer] }).then(function(question) {
+      if(!question) {
+        res.status(404).render('404');
+        return;
+      }
+
+      question.update({ question: questionText }).then(function() {
+        // We could do a diff of current answers and new ones but for the sake of simplicity,
+        // I'm just going to delete all answers and add the new ones.
+        return Answer.destroy({ where: { questionId: questionId } })
+      }).then(function() {
+        return Promise.settle(createAnswerPromises(answers, questionId));
+      }).then(function() {
+        res.redirect('/admin/questions');
+      });
+    });
   },
 
   delete: function(req, res) {
