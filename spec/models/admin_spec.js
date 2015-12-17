@@ -31,4 +31,32 @@ describe('Admin', function() {
   it('doesn\'t allow invalid emails', function(done) {
     this.checkAdminIsNotValid('emailexample.com', 'password', done);
   });
+
+  describe('#setPassword', function() {
+    it('sets the passwordDigest', function() {
+      var admin = Admin.build({ email: 'user@exmple.com' });
+      expect(admin.passwordDigest).toBeUndefined();
+      admin.setPassword('some password');
+      expect(admin.passwordDigest).not.toBeUndefined();
+    });
+  });
+
+  describe('#comparePassword', function() {
+    var admin = null;
+
+    beforeEach(function(done) {
+      this.createDefaultAdmin().then(function(a) {
+        admin = a;
+        done();
+      });
+    });
+
+    it('returns true with correct password', function() {
+      expect(admin.comparePassword('password')).toBe(true);
+    });
+
+    it('returns false with incorrect password', function() {
+      expect(admin.comparePassword('wrong password')).toBe(false);
+    });
+  });
 });

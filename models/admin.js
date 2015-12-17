@@ -25,6 +25,10 @@ module.exports = function(sequelize, DataTypes) {
     instanceMethods: {
       setPassword: function(password) {
         this.passwordDigest = bcrypt.hashSync(password);
+      },
+
+      comparePassword: function(password) {
+        return bcrypt.compareSync(password, this.passwordDigest);
       }
     },
     classMethods: {
