@@ -1,0 +1,9 @@
+extends /layout.jade
+
+block content
+    .card.admin
+        h1 Questions
+        .questions
+            each q, i in questions
+                p
+                    a(href="/admin/questions/#{q.id}/edit")= q.question

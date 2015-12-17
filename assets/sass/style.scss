@@ -35,6 +35,16 @@ input[type=submit] {
     box-shadow: 2px 2px 5px #bbbbbb;
 }
 
+.admin .questions{
+    border-top: 1px solid #cccccc;
+
+    p {
+        border-bottom: 1px solid #cccccc;
+        padding: 15px 13px;
+        margin: 0;
+    }
+}
+
 .answers {
     border-top: 1px solid #cccccc;
 
