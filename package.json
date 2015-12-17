@@ -12,6 +12,7 @@
   },
   "author": "Shane Burkhart",
   "dependencies": {
+    "bcryptjs": "^2.3.0",
     "body-parser": "^1.14.1",
     "bower": "^1.7.1",
     "cookie-parser": "^1.4.0",
