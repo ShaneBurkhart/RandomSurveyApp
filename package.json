@@ -7,7 +7,8 @@
     "jasmine": "jasmine",
     "test": "jasmine",
     "bower": "bower",
-    "gulp": "gulp"
+    "gulp": "gulp",
+    "nodemon": "nodemon"
   },
   "author": "Shane Burkhart",
   "dependencies": {
@@ -27,6 +28,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.5.1",
     "jasmine": "^2.4.1",
+    "nodemon": "^1.8.1",
     "sequelize-cli": "^2.2.1",
     "umzug": "^1.7.1"
   }
