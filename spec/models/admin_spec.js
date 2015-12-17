@@ -32,6 +32,14 @@ describe('Admin', function() {
     this.checkAdminIsNotValid('emailexample.com', 'password', done);
   });
 
+  it('doesn\'t allow duplicate emails', function(done) {
+    var self = this;
+    // Make sure user@example.com is created
+    this.createDefaultAdmin().then(function() {
+      self.checkAdminIsNotValid('user@example.com', 'password', done);
+    });
+  });
+
   describe('#setPassword', function() {
     it('sets the passwordDigest', function() {
       var admin = Admin.build({ email: 'user@exmple.com' });

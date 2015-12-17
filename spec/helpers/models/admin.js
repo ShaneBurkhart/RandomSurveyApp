@@ -6,13 +6,13 @@ var Admin = db.admin;
 
 beforeEach(function() {
   this.checkAdminIsNotValid = function(email, passwordDigest, done) {
-      Admin.create({
-        email: email,
-        passwordDigest: passwordDigest
-      }).then(function(a) {
-        expect(a).toBeUndefined();
-        done();
-      }).catch(this.createCheckHasErrorsCallback(done));
+    Admin.create({
+      email: email,
+      passwordDigest: passwordDigest
+    }).then(function(a) {
+      expect(a).toBeUndefined();
+      done();
+    }).catch(this.createCheckHasErrorsCallback(done));
   };
 
   this.createDefaultAdmin = function() {
@@ -23,8 +23,15 @@ beforeEach(function() {
     var admin = Admin.build({
       email: email
     });
-
     admin.setPassword(password);
-    return admin.save();
+
+    return Admin.findOrCreate({
+      where: { email: admin.email },
+      defaults: { passwordDigest: admin.passwordDigest }
+    }).spread(function(admin, created) {
+      return new Promise(function(resolve, reject) {
+        resolve(admin);
+      });
+    });
   };
 });
