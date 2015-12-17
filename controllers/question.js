@@ -11,9 +11,14 @@ var QuestionController = {
   show: function(req, res) {
     var alreadySeen = req.cookies.alreadySeen || [];
     findRandomQuestion(alreadySeen).then(function(q) {
-      res.render('question/show', {
-        question: q
-      });
+      if(q) {
+        q.getAnswers().then(function(answers) {
+          q.answers = answers;
+          res.render('question/show', { question: q });
+        });
+      } else {
+          res.render('question/show', { question: q });
+      }
     });
   },
 

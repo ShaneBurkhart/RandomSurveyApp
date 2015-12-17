@@ -121,6 +121,7 @@ var createMockResponse = function(view, hasQuestion, checkStats, status, done) {
         expect(data.question).not.toBeUndefined();
         expect(data.question).not.toBeNull();
         expect(data.question.Model.name).toEqual('question');
+        expect(data.question.answers).not.toBeUndefined();
       } else {
         expect(data.question).toBeNull();
       }
