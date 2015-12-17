@@ -41,9 +41,50 @@ describe('AdminController', function() {
   });
 
   //describe('#create');
-  //describe('#edit');
+
+  describe('#edit', function() {
+    it('renders admin/edit', function(done) {
+      Question.findOne().then(function(q) {
+        var mockRequest = createMockRequest();
+        var mockResponse = createMockResponse('admin/edit', 200, null, function(data) {
+          expect(data.question).not.toBeUndefined();
+          expect(data.question).not.toBeNull();
+          expect(data.question.id).toBe(q.id);
+        }, done);
+
+        mockRequest.params.id = q.id;
+
+        AdminController.edit(mockRequest, mockResponse);
+      });
+    });
+
+    it('renders a 404 when the question is not found', function(done) {
+      var mockRequest = createMockRequest();
+      var mockResponse = createMockResponse('404', 404, null, null, done);
+
+      mockRequest.params.id = 0;
+      AdminController.edit(mockRequest, mockResponse);
+    })
+  });
+
   //describe('#update');
-  //describe('#delete');
+
+  describe('#delete', function() {
+    it('deletes the question and redirects to /admin/questions', function(done) {
+      Question.findOne().then(function(q) {
+        var mockRequest = createMockRequest();
+        var mockResponse = createMockResponse(null, 200, '/admin/questions', null, function() {
+          Question.findById(q.id).then(function(deletedQuestion) {
+            expect(deletedQuestion).toBeNull();
+            done();
+          });
+        });
+
+        mockRequest.params.id = q.id;
+        AdminController.delete(mockRequest, mockResponse);
+      });
+    });
+  });
 
   describe('#showLogin', function() {
     it('renders the login form', function(done) {
@@ -97,6 +138,7 @@ describe('AdminController', function() {
 
 var createMockRequest = function() {
   return {
+    params: {},
     body: {},
     session: {}
   };
@@ -108,6 +150,7 @@ var createMockResponse = function(expectedView, expectedStatus, redirectUrl, che
 
     status: function(code) {
       this.statusCode = code;
+      return this;
     },
 
     render: function(view, data) {

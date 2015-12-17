@@ -26,6 +26,17 @@ var AdminController = {
 
   edit: function(req, res) {
     // Show edit of question.  On that page, there will be answer editing.
+    var questionId = req.params.id;
+
+    Question.findById(questionId, { include: [db.answer] }).then(function(question) {
+      if(question) {
+        res.render('admin/edit', {
+          question: question
+        });
+      } else {
+        res.status(404).render('404');
+      }
+    })
   },
 
   update: function(req, res) {
@@ -33,7 +44,11 @@ var AdminController = {
   },
 
   delete: function(req, res) {
-    // Delete question
+    var questionId = req.params.id;
+
+    Question.destroy({ where: { id: questionId } }).then(function(rowsAffected) {
+      res.redirect('/admin/questions');
+    });
   },
 
   showLogin: function(req, res) {
