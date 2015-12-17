@@ -1,6 +1,10 @@
 'use strict'
 
 beforeEach(function() {
+  this.simpleCatch = function(err) {
+    console.log(err);
+  };
+
   this.createMockResponseRenderWithAssertions = function(done) {
     return {
       render: function(view, data, callback) {
