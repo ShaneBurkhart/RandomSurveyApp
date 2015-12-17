@@ -45,8 +45,15 @@ var QuestionController = {
 
         return findRandomQuestion(alreadySeen);
       }).then(function(newQ) {
-        res.json({ question: newQ });
-      }).catch(function(err){ console.log(err); });;
+        if(newQ) {
+          newQ.getAnswers().then(function(answers) {
+            newQ.answers = answers;
+            res.json({ question: newQ });
+          });
+        } else {
+            res.json({ question: newQ });
+        }
+      });
     })
   }
 }
