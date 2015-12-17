@@ -119,7 +119,7 @@ var createMockResponse = function(view, hasQuestion, checkStats, status, done) {
     },
 
     render: function(view, data, callback) {
-      expect(view).toEqual('question/show');
+      expect(view).toEqual(view);
       expect(this.statusCode).toBe(status);
 
       if(hasQuestion) {
