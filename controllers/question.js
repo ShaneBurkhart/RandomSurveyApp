@@ -88,7 +88,7 @@ var findRandomQuestion = function(alreadySeen) {
       return null;
     }
     var index = randomInt(0, questions.length);
-    return questions[0];
+    return questions[index];
   });
 };
 
