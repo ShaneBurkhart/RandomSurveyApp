@@ -40,7 +40,55 @@ describe('AdminController', function() {
     });
   });
 
-  //describe('#create');
+  describe('#create', function() {
+    it('creates a questions with answers and redirects to /admin/questions', function(done) {
+      // Deleting all other questions and answers to ensure this created both.
+      Promise.settle([
+        Question.destroy({ where: {} }),
+        Answer.destroy({ where: {} })
+      ]).then(function() {
+        var mockRequest = createMockRequest();
+        var mockResponse = createMockResponse(null, 302, '/admin/questions', null, function() {
+          Promise.settle([ Question.count(), Answer.count() ]).then(function(countPromises) {
+            expect(countPromises[0].value()).toBe(1); // Question count
+            expect(countPromises[1].value()).toBe(3); // Answer count
+          });
+          done();
+        });
+
+        mockRequest.body.question = {
+          question: 'My name is Ron Burgundy?',
+          answers: [ 'Yes', 'No', 'maybe' ]
+        };
+
+        AdminController.create(mockRequest, mockResponse);
+      });
+    });
+
+    it('renders admin/new when invalid question', function(done) {
+      var mockRequest = createMockRequest();
+      var mockResponse = createMockResponse('admin/new', 200, null, null, done);
+
+      mockRequest.body.question = {
+        question: '',
+        answers: [ 'Yes', 'No', 'maybe' ]
+      };
+
+      AdminController.create(mockRequest, mockResponse);
+    });
+
+    it('renders admin/new when no answers submitted', function(done) {
+      var mockRequest = createMockRequest();
+      var mockResponse = createMockResponse('admin/new', 200, null, null, done);
+
+      mockRequest.body.question = {
+        question: 'My name is Ron Burgundy?',
+        answers: null
+      };
+
+      AdminController.create(mockRequest, mockResponse);
+    });
+  });
 
   describe('#edit', function() {
     it('renders admin/edit', function(done) {
@@ -73,7 +121,7 @@ describe('AdminController', function() {
     it('deletes the question and redirects to /admin/questions', function(done) {
       Question.findOne().then(function(q) {
         var mockRequest = createMockRequest();
-        var mockResponse = createMockResponse(null, 200, '/admin/questions', null, function() {
+        var mockResponse = createMockResponse(null, 302, '/admin/questions', null, function() {
           Question.findById(q.id).then(function(deletedQuestion) {
             expect(deletedQuestion).toBeNull();
             done();
@@ -102,7 +150,7 @@ describe('AdminController', function() {
 
     it('logs in and redirects with correct credentials', function(done) {
       var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse(null, 200, '/admin/questions', null, done);
+      var mockResponse = createMockResponse(null, 302, '/admin/questions', null, done);
 
       mockRequest.body.email = 'user@example.com'
       mockRequest.body.password = 'password'
@@ -163,6 +211,8 @@ var createMockResponse = function(expectedView, expectedStatus, redirectUrl, che
     },
 
     redirect: function(path) {
+      this.status(302);
+      expect(this.statusCode).toEqual(expectedStatus);
       expect(path).toEqual(redirectUrl);
       done();
     }

@@ -1,6 +1,8 @@
 'use strict'
 
 var db = require('../models/db.js');
+var Sequelize = db.Sequelize;
+var Promise = Sequelize.Promise;
 var Question = db.question;
 var Answer = db.answer;
 var Admin = db.admin;
@@ -22,6 +24,22 @@ var AdminController = {
 
   create: function(req, res) {
     // POST for new.  Creates both questions and answers.
+    var question = req.body.question;
+    var questionText = getQuestionText(question);
+    var answers = getAnswers(question);
+
+    if(!question || !questionText || !answers.length) {
+      res.render('admin/new', {
+        question: question
+      });
+      return;
+    }
+
+    Question.create({ question: questionText }).then(function(question) {
+      return Promise.settle(createAnswerPromises(answers, question.id));
+    }).then(function() {
+      res.redirect('/admin/questions');
+    }).catch(this.simpleCatch);
   },
 
   edit: function(req, res) {
@@ -68,5 +86,43 @@ var AdminController = {
     });
   }
 };
+
+var getQuestionText = function(questionRequestBody) {
+  if(questionRequestBody && questionRequestBody.question) {
+    return questionRequestBody.question;
+  }
+  return false;
+};
+
+var getAnswers = function(questionRequestBody) {
+  var answers = [];
+  var answer = null;
+
+  if(questionRequestBody && questionRequestBody.answers) {
+    var requestAnswers = questionRequestBody.answers;
+    for(var i = 0; i < requestAnswers.length; i++) {
+      answer = requestAnswers[i];
+      if(answer) {
+        answers.push(answer);
+      }
+    }
+  }
+  return answers;
+}
+
+var createAnswerPromises = function(answers, questionId) {
+  var answerPromises = [];
+  var answer = null;
+
+  for(var i = 0; i < answers.length; i++) {
+    answer = answers[i];
+
+    answerPromises.push(Answer.create({
+      answer: answer,
+      questionId: questionId
+    }));
+  }
+  return answerPromises;
+}
 
 module.exports = AdminController;
