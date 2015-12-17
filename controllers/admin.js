@@ -17,6 +17,7 @@ var AdminController = {
 
   new: function(req, res) {
     // Show form to create questions with answers.
+    res.render('admin/new');
   },
 
   create: function(req, res) {

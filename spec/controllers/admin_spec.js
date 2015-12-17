@@ -31,9 +31,15 @@ describe('AdminController', function() {
     });
   });
 
-  //describe('#new', function() {
+  describe('#new', function() {
+    it('renders admin/new', function(done) {
+      var mockRequest = createMockRequest();
+      var mockResponse = createMockResponse('admin/new', 200, null, null, done);
 
-  //});
+      AdminController.new(mockRequest, mockResponse);
+    });
+  });
+
   //describe('#create');
   //describe('#edit');
   //describe('#update');
