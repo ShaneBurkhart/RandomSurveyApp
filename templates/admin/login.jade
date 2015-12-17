@@ -1,0 +1,16 @@
+extends /layout.jade
+
+block content
+    .card
+        h2 Login
+        form(action="/admin/login" method="POST")
+            label(for="email") Email
+            br
+            input(name="email" type="email")
+            br
+            label(for="password") Password
+            br
+            input(name="password" type="password")
+            br
+            br
+            input(type="submit" value="Login")

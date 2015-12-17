@@ -17,6 +17,15 @@ h2 {
     font-weight: 300;
 }
 
+input {
+    width: 200px;
+}
+
+input[type=submit] {
+    width: 100px;
+    background-color: #cccccc;
+}
+
 .card {
     background-color: #ffffff;
     width: 700px;
