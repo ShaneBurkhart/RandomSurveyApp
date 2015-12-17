@@ -24,25 +24,29 @@ var QuestionController = {
 
   answer: function(req, res) {
     var questionId = req.params.id;
-    var answerId = req.body.answerId;
+    var answerId = parseInt(req.body.answerId);
 
     Question.findById(questionId, {
       include: [db.answer]
     }).then(function(q) {
-      if(!q || !questionHasAnswerId(q, answerId)) {
+      // Checking if answerId is NaN
+      if(!q || !answerId || !questionHasAnswerId(q, answerId)) {
         res.status(404).json({});
         return;
       }
 
-      return updateStats(questionId, answerId).then(function() {
+      updateStats(questionId, answerId).then(function() {
         var alreadySeen = req.cookies.alreadySeen || [];
         alreadySeen.push(questionId);
-        res.cookies.alreadySeen = alreadySeen;
+        res.cookie('alreadySeen', alreadySeen, {
+          maxAge: 5 * 365 * 24 * 60 * 60 * 1000, // 5 years
+          httpOnly: true
+        });
 
         return findRandomQuestion(alreadySeen);
       }).then(function(newQ) {
         res.json({ question: newQ });
-      });
+      }).catch(function(err){ console.log(err); });;
     })
   }
 }

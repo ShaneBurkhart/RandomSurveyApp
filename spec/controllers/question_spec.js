@@ -113,6 +113,11 @@ var createMockResponse = function(view, hasQuestion, checkStats, status, done) {
   return {
     statusCode: 200,
     cookies: {},
+
+    cookie: function(name, value, options) {
+      this.cookies[name] = value;
+    },
+
     render: function(view, data, callback) {
       expect(view).toEqual('question/show');
       expect(this.statusCode).toBe(status);
@@ -132,11 +137,15 @@ var createMockResponse = function(view, hasQuestion, checkStats, status, done) {
     json: function(data) {
       expect(this.statusCode).toBe(status);
 
+      if(status === 200) {
+        expect(this.cookies.alreadySeen).not.toBeUndefined();
+      }
+
       if(hasQuestion) {
         expect(data.question).not.toBeUndefined();
         expect(data.question.Model.name).toEqual('question');
       } else {
-        if(status == 200) {
+        if(status === 200) {
           expect(data.question).toBeNull();
         } else {
           expect(data).toEqual({});
