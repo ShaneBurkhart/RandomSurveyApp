@@ -19,5 +19,6 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 app.get('/', QuestionController.show);
+app.post('/question/:id/answer', QuestionController.answer);
 
 http.createServer(app).listen(process.env.PORT);

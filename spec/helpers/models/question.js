@@ -1,21 +1,7 @@
 'use strict'
 
-var createCheckHasNoErrorsCallback = function(done) {
-  return function(err) {
-      expect(err).toBeUndefined();
-      done();
-  }
-};
-
-var createCheckHasErrorsCallback = function(done) {
-  return function(err) {
-      expect(err).not.toBeUndefined();
-      done();
-  }
-};
-'use strict'
-
 var db = require('../../../models/db.js');
+var Promise = db.Sequelize.Promise;
 var Question = db.question;
 
 beforeEach(function() {
@@ -26,6 +12,17 @@ beforeEach(function() {
         expect(q).toBeUndefined();
         done();
       }).catch(this.createCheckHasErrorsCallback(done));
+  };
+
+  this.createDefaultQuestionWithAnswers = function() {
+    var self = this;
+
+    return this.createDefaultQuestion().then(function(q) {
+      return Promise.settle([
+        self.createAnswer('Yes', q.id),
+        self.createAnswer('No', q.id)
+      ]);
+    });
   };
 
   this.createDefaultQuestion = function() {

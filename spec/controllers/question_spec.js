@@ -5,19 +5,19 @@ var db = require('../../models/db.js');
 var Question = db.question;
 
 describe('QuestionController', function() {
+  beforeEach(function(done) {
+    var self = this;
+
+    Question.destroy({ where: {} }).then(function() {
+      return self.createDefaultQuestionWithAnswers();
+    }).then(done);
+  });
+
   describe('#show', function() {
-    beforeEach(function(done) {
-      var self = this;
-
-      Question.destroy({ where: {} }).then(function() {
-        return self.createDefaultQuestion();
-      }).then(done);
-    });
-
     it('shows a question', function(done) {
       QuestionController.show(
         createMockRequest(),
-        createMockReponse('question/show', true, done)
+        createMockResponse('question/show', true, false, 200, done)
       );
     });
 
@@ -30,48 +30,136 @@ describe('QuestionController', function() {
 
         QuestionController.show(
           mockRequest,
-          createMockReponse('question/show', false, done)
+          createMockResponse('question/show', false, false, 200, done)
         );
       });
     });
   })
 
   describe('#answer', function() {
-    it('responds with a 404 when the questionId isn\t found', function() {
-      expect(true).toBe(false);
+    it('responds with a 404 when the questionId isn\t found', function(done) {
+      var mockRequest = createMockRequest();
+      var mockResponse = createMockResponse(null, false, false, 404, done);
+      // Zero should never be an id.
+      mockRequest.params.id = 0;
+
+      QuestionController.answer(mockRequest, mockResponse);
     });
 
-    it('responds with a 404 when the answerId doesn\'t belong to the question', function() {
-      expect(true).toBe(false);
+    it('responds with a 404 when the answerId doesn\'t belong to the question', function(done) {
+      var mockRequest = createMockRequest();
+      var mockResponse = createMockResponse(null, false, false, 404, done);
+
+      Question.findOne().then(function(q) {
+        mockRequest.params.id = q.id;
+        // Zero should never be an id.
+        mockRequest.body.answerId = 0;
+        QuestionController.answer(mockRequest, mockResponse);
+      });
     });
 
-    it('returns a new question on success', function() {
-      expect(true).toBe(false);
+    it('returns a question on success', function(done) {
+      var mockRequest = createMockRequest();
+      var mockResponse = createMockResponse(null, true, true, 200, done);
+
+      // BeforeEach creates only one question.  For this test, we want two so that
+      // one is returned.  We'll use the question we just created to make the request.
+      this.createDefaultQuestionWithAnswers().then(function(q) {
+        return Question.findOne({ include: [db.answer] });
+      }).then(function(q) {
+        mockRequest.params.id = q.id;
+        mockRequest.body.answerId = q.answers[0].id;
+        QuestionController.answer(mockRequest, mockResponse);
+      });
     });
 
-    it('increments stats for timesAnswered and timesAsked', function() {
-      expect(true).toBe(false);
+    it('returns an empty object when there aren\'t anymore questions', function(done) {
+      var mockRequest = createMockRequest();
+      var mockResponse = createMockResponse(null, false, false, 200, done);
+
+      Question.findOne({ include: [db.answer] }).then(function(q) {
+        // Zero should never be an id.
+        mockRequest.params.id = q.id;
+        mockRequest.body.answerId = q.answers[0].id;
+
+        QuestionController.answer(mockRequest, mockResponse);
+      });
+    });
+
+    it('increments stats for timesAnswered and timesAsked', function(done) {
+      var mockRequest = createMockRequest();
+      var mockResponse = createMockResponse(null, false, true, 200, done);
+
+      Question.findOne({ include: [db.answer] }).then(function(q) {
+        // Zero should never be an id.
+        mockRequest.params.id = q.id;
+        mockRequest.body.answerId = q.answers[0].id;
+
+        QuestionController.answer(mockRequest, mockResponse);
+      });
     });
   });
 });
 
 var createMockRequest = function() {
   return {
-    cookies: {}
+    cookies: {},
+    params: {},
+    body: {}
   }
 };
 
-var createMockReponse = function(view, hasQuestion, done) {
+var createMockResponse = function(view, hasQuestion, checkStats, status, done) {
   return {
+    statusCode: 200,
+    cookies: {},
     render: function(view, data, callback) {
       expect(view).toEqual('question/show');
+      expect(this.statusCode).toBe(status);
+
       if(hasQuestion) {
         expect(data.question).not.toBeUndefined();
+        expect(data.question).not.toBeNull();
         expect(data.question.Model.name).toEqual('question');
       } else {
         expect(data.question).toBeNull();
       }
+
       done();
+    },
+
+    json: function(data) {
+      expect(this.statusCode).toBe(status);
+
+      if(hasQuestion) {
+        expect(data.question).not.toBeUndefined();
+        expect(data.question.Model.name).toEqual('question');
+      } else {
+        if(status == 200) {
+          expect(data.question).toBeNull();
+        } else {
+          expect(data).toEqual({});
+        }
+      }
+      if(checkStats) {
+        // TODO This is fragile and should probably be changed at some point.
+        // The only value that should be in alreadySeen is the one from this call.
+        Question.findById(
+          this.cookies.alreadySeen[0],
+          { include: [db.answer] }
+        ).then(function(q) {
+          expect(q.timesAnswered).toBe(1);
+          expect(q.answers[0].timesAnswered).toBe(1);
+          done();
+        });
+      } else {
+        done();
+      }
+    },
+
+    status: function(statusCode) {
+      this.statusCode = statusCode;
+      return this;
     }
   };
 };
