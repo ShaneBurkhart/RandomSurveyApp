@@ -7,7 +7,7 @@ var Question = db.question;
 beforeEach(function() {
   this.checkQuestionIsNotValid = function(q, done) {
       Question.create({
-        question: ''
+        question: q
       }).then(function(q) {
         expect(q).toBeUndefined();
         done();
