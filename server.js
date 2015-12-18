@@ -35,15 +35,19 @@ app.get('/', QuestionController.show);
 app.post('/question/:id/answer', QuestionController.answer);
 
 var adminRouter = express.Router();
+// Authentication middleware
 adminRouter.use(function(req, res, next) {
   // Insecure routes
   if(req.path === '/' || req.path === '/login') {
-    next();
-    return
-  }
-  if(!req.session.adminId) {
-    res.status(404).send('Not found!');
-    return;
+    if(req.session.adminId) {
+      res.redirect('/admin/questions');
+      return;
+    }
+  } else {
+    if(!req.session.adminId) {
+      res.status(404).render('404');
+      return;
+    }
   }
   next();
 });
