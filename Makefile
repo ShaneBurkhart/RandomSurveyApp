@@ -2,11 +2,18 @@ all: start
 
 BASE_TAG=shaneburkhart/random-survey-app
 
+DOCKER_COMPOSE_FILE?=docker-compose.yml
+TEST_DOCKER_COMPOSE_FILE?=docker-compose.test.yml
+
 build:
 	docker build -t ${BASE_TAG} .
 
 start:
-	docker-compose up -d
+	docker-compose -f ${DOCKER_COMPOSE_FILE} up -d
+	echo "Wait for db to start."
+	sleep 6
+	docker-compose -f ${DOCKER_COMPOSE_FILE} run web npm run sequelize db:migrate
+	docker-compose -f ${DOCKER_COMPOSE_FILE} run web npm run sequelize db:seed
 
 restart: clean start
 
@@ -25,18 +32,15 @@ logs:
 c:
 	docker-compose run --rm web /bin/bash
 
-mysql: migrate
+mysql: start
 	docker-compose run --rm mysql mysql --user=root --password=password --host=mysql --database=mydb
 
 test:
-	docker-compose -f docker-compose.test.yml -p survey-test up -d
+	docker-compose -f ${TEST_DOCKER_COMPOSE_FILE} -p survey-test up -d
 	echo "Wait for db to start."
 	sleep 6
-	docker-compose -f docker-compose.test.yml -p survey-test run web npm run sequelize db:migrate
-	docker-compose -f docker-compose.test.yml -p survey-test run --rm web npm test
-
-migrate: start
-	docker-compose run web npm run sequelize db:migrate
+	docker-compose -f ${TEST_DOCKER_COMPOSE_FILE} -p survey-test run web npm run sequelize db:migrate
+	docker-compose -f ${TEST_DOCKER_COMPOSE_FILE} -p survey-test run --rm web npm test
 
 migration:
 ifdef NAME
