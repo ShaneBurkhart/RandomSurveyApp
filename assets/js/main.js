@@ -1,4 +1,23 @@
 $(function() {
+  var answersFormContainer = $('#answers-form-container');
+  var addAnswerButton = $('#add-answer');
+
+  addAnswerButton.click(function(e) {
+    e.preventDefault();
+    var lastAnswerLabel = answersFormContainer.find('label').last();
+    var nextAnswerNum = parseInt(lastAnswerLabel.text().trim().slice(-1)) + 1;
+
+    if(!nextAnswerNum) {
+      return;
+    }
+
+    answersFormContainer.append([
+      '<label for="question[answers][]">Answer ' + nextAnswerNum + '</label>',
+      '<input name="question[answers][]" type="text"></input>'
+    ].join(""));
+  });
+
+
   var answersContainer = $('.answers');
   var questionElement = $('h2#question');
   var canAnswer = true;
