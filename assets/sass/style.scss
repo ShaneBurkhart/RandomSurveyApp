@@ -5,6 +5,8 @@ html, body {
     background-color: #eeeeee;
     background-image: url("/img/background.png");
     background-repeat: repeat;
+    margin: 0;
+    padding: 0;
 }
 
 h1, h2, h3, h4, h5 {
@@ -41,7 +43,7 @@ table {
     background-color: #ffffff;
     width: 700px;
     padding: 30px;
-    margin: 50px auto 0;
+    margin: 30px auto 0;
     border: 1px solid #cccccc;
     box-shadow: 2px 2px 5px #bbbbbb;
 }
@@ -68,5 +70,19 @@ table {
             background-color: #f3f3f3;
             cursor: pointer;
         }
+    }
+}
+
+@media (max-width: 780px) {
+    .card {
+        width: auto;
+        margin-left: 2%;
+        margin-right: 2%;
+    }
+}
+
+@media (max-width: 290px) {
+    input {
+        width: 100%;
     }
 }
