@@ -19,11 +19,11 @@ app.locals.basedir = templateDir;
 app.use(cookieParser());
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
 app.use(session({
   resave: false, // don't save session if unmodified
   saveUninitialized: false, // don't create session until something stored
-  // TODO change this
-  secret: 'shhhh, very secret'
+  secret: 'a very secret key'
 }));
 
 app.use(function(err, req, res, next) {
