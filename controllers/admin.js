@@ -8,12 +8,12 @@ var Answer = db.answer;
 var Admin = db.admin;
 
 var AdminController = {
-  index: function(req, res) {
+  index: function(req, res, next) {
     Question.findAll().then(function(questions) {
       res.render('admin/index', {
         questions: questions
       });
-    });
+    }).catch(next);
   },
 
   new: function(req, res) {
@@ -25,7 +25,7 @@ var AdminController = {
     } });
   },
 
-  create: function(req, res) {
+  create: function(req, res, next) {
     var question = req.body.question;
     var questionText = getQuestionText(question);
     var answers = getAnswers(question);
@@ -38,10 +38,11 @@ var AdminController = {
 
     Question.create({ question: questionText })
       .then(createSaveAnswersForQuestionCallback(answers))
-      .then(createRedirectToIndexCallback(res));
+      .then(createRedirectToIndexCallback(res))
+      .catch(next);
   },
 
-  edit: function(req, res) {
+  edit: function(req, res, next) {
     var questionId = req.params.id;
 
     createFindQuestionByIdCallback(questionId)()
@@ -54,10 +55,10 @@ var AdminController = {
         res.render('admin/edit', {
           question: question
         });
-      });
+      }).catch(next);
   },
 
-  update: function(req, res) {
+  update: function(req, res, next) {
     var self = this;
     var questionId = req.params.id;
     var question = req.body.question;
@@ -66,7 +67,9 @@ var AdminController = {
 
     var error = getRequestError(questionText, answers);
     if(error) {
-      res.render('admin/edit', { error: error, question: question });
+      createFindQuestionByIdCallback(questionId)().then(function(q) {
+        res.render('admin/edit', { error: error, question: q || question});
+      }).catch(next);
       return;
     }
 
@@ -79,14 +82,15 @@ var AdminController = {
       return question.update({ question: questionText })
         .then(createSaveAnswersForQuestionCallback(answers))
         .then(createRedirectToIndexCallback(res));
-    });
+    }).catch(next);
   },
 
-  delete: function(req, res) {
+  delete: function(req, res, next) {
     var questionId = req.params.id;
 
     Question.destroy({ where: { id: questionId } })
-      .then(createRedirectToIndexCallback(res));
+      .then(createRedirectToIndexCallback(res))
+      .catch(next);
   },
 
   showLogin: function(req, res) {

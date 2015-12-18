@@ -11,7 +11,7 @@ describe('QuestionController', function() {
 
     Question.destroy({ where: {} }).then(function() {
       return self.createDefaultQuestionWithAnswers();
-    }).then(done);
+    }).then(done).catch(this.simpleCatch);
   });
 
   describe('#show', function() {
@@ -24,10 +24,11 @@ describe('QuestionController', function() {
         expect(data.question.answers).not.toBeUndefined();
       }, done);
 
-      QuestionController.show(mockRequest, mockResponse);
+      QuestionController.show(mockRequest, mockResponse, this.simpleCatch);
     });
 
     it('doesn\'t show the same question twice', function(done) {
+      var self = this;
       var mockRequest = this.createMockRequest();
       var mockResponse = this.createMockResponse('question/show', 200, null, function(data) {
         expect(data.question).toBeNull();
@@ -37,8 +38,8 @@ describe('QuestionController', function() {
       // there shouldn't be a question in the response.
       Question.findOne().then(function(q) {
         mockRequest.cookies.alreadySeen = [ q.id ];
-        QuestionController.show(mockRequest, mockResponse);
-      });
+        QuestionController.show(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
   })
 
@@ -49,10 +50,11 @@ describe('QuestionController', function() {
       // Zero should never be an id.
       mockRequest.params.id = 0;
 
-      QuestionController.answer(mockRequest, mockResponse);
+      QuestionController.answer(mockRequest, mockResponse, this.simpleCatch);
     });
 
     it('responds with a 404 when the answerId doesn\'t belong to the question', function(done) {
+      var self = this;
       var mockRequest = this.createMockRequest();
       var mockResponse = this.createMockResponse(null, 404, null, null, done);
 
@@ -60,11 +62,12 @@ describe('QuestionController', function() {
         mockRequest.params.id = q.id;
         // Zero should never be an id.
         mockRequest.body.answerId = 0;
-        QuestionController.answer(mockRequest, mockResponse);
-      });
+        QuestionController.answer(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('returns a question on success', function(done) {
+      var self = this;
       var mockRequest = this.createMockRequest();
       var mockResponse = this.createMockResponse(null, 200, null, function(data) {
         expect(data.question).not.toBeUndefined();
@@ -78,11 +81,12 @@ describe('QuestionController', function() {
       this.createDefaultQuestionWithAnswers().then(function(q) {
         mockRequest.params.id = q.id;
         mockRequest.body.answerId = q.answers[0].id;
-        QuestionController.answer(mockRequest, mockResponse);
-      });
+        QuestionController.answer(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('returns an empty object when there aren\'t anymore questions', function(done) {
+      var self = this;
       var mockRequest = this.createMockRequest();
       var mockResponse = this.createMockResponse(null, 200, null, function(data) {
         expect(data.question).toBeNull();
@@ -93,8 +97,8 @@ describe('QuestionController', function() {
         mockRequest.params.id = q.id;
         mockRequest.body.answerId = q.answers[0].id;
 
-        QuestionController.answer(mockRequest, mockResponse);
-      });
+        QuestionController.answer(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('increments stats for timesAnswered and timesAsked', function(done) {
@@ -107,15 +111,15 @@ describe('QuestionController', function() {
             expect(question.timesAnswered).toBe(1);
             expect(question.answers[0].timesAnswered).toBe(1);
             done();
-          });
+          }).catch(self.simpleCatch);
         });
 
         // Zero should never be an id.
         mockRequest.params.id = q.id;
         mockRequest.body.answerId = q.answers[0].id;
 
-        QuestionController.answer(mockRequest, mockResponse);
-      });
+        QuestionController.answer(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
   });
 });

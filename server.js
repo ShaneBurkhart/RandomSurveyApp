@@ -26,6 +26,11 @@ app.use(session({
   secret: 'shhhh, very secret'
 }));
 
+app.use(function(err, req, res, next) {
+  console.log('[error]', err);
+  res.status(500).render('500');
+});
+
 app.get('/', QuestionController.show);
 app.post('/question/:id/answer', QuestionController.answer);
 

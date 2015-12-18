@@ -10,17 +10,18 @@ var COOKIE_DURATION = 5 * 365 * 24 * 60 * 60 * 1000; // 5 years
 
 var QuestionController = {
   // Shows a random survey question that the user has not seen yet.
-  show: function(req, res) {
+  show: function(req, res, next) {
     var alreadySeen = req.cookies.alreadySeen || [];
 
     createFindRandomQuestionIdCallback()(alreadySeen)
       .then(createFindQuestionWithAnswersByIdCallback())
       .then(createRenderQuestionCallback(function(data) {
         res.render('question/show', data);
-      }));
+      }))
+      .catch(next);
   },
 
-  answer: function(req, res) {
+  answer: function(req, res, next) {
     var questionId = req.params.id;
     var answerId = parseInt(req.body.answerId);
 
@@ -32,14 +33,14 @@ var QuestionController = {
           return;
         }
 
-        createUpdateStatsCallback(questionId, answerId)()
+        return createUpdateStatsCallback(questionId, answerId)()
           .then(createUpdateAlreadySeenCallback(questionId, req, res))
           .then(createFindRandomQuestionIdCallback())
           .then(createFindQuestionWithAnswersByIdCallback())
           // Since we are passing a function, it doesn't have any reference of 'this'
           // bind sets this to the mockResponse
           .then(createRenderQuestionCallback(res.json.bind(res)))
-      });
+      }).catch(next);
   }
 }
 

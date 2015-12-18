@@ -27,7 +27,7 @@ describe('AdminController', function() {
         expect(data.questions.length).toBe(2);
       }, done);
 
-      AdminController.index(mockRequest, mockResponse);
+      AdminController.index(mockRequest, mockResponse, this.simpleCatch);
     });
   });
 
@@ -36,7 +36,7 @@ describe('AdminController', function() {
       var mockRequest = this.createMockRequest();
       var mockResponse = this.createMockResponse('admin/new', 200, null, null, done);
 
-      AdminController.new(mockRequest, mockResponse);
+      AdminController.new(mockRequest, mockResponse, this.simpleCatch);
     });
   });
 
@@ -54,7 +54,7 @@ describe('AdminController', function() {
             expect(countPromises[0].value()).toBe(1); // Question count
             expect(countPromises[1].value()).toBe(2); // Answer count
             done();
-          });
+          }).catch(self.simpleCatch);
         });
 
         mockRequest.body.question = {
@@ -65,8 +65,8 @@ describe('AdminController', function() {
           ]
         };
 
-        AdminController.create(mockRequest, mockResponse);
-      });
+        AdminController.create(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('renders admin/new when invalid question', function(done) {
@@ -86,7 +86,7 @@ describe('AdminController', function() {
         ]
       };
 
-      AdminController.create(mockRequest, mockResponse);
+      AdminController.create(mockRequest, mockResponse, this.simpleCatch);
     });
 
     it('renders admin/new when no answers submitted', function(done) {
@@ -102,7 +102,7 @@ describe('AdminController', function() {
         answers: null
       };
 
-      AdminController.create(mockRequest, mockResponse);
+      AdminController.create(mockRequest, mockResponse, this.simpleCatch);
     });
   });
 
@@ -120,8 +120,8 @@ describe('AdminController', function() {
 
         mockRequest.params.id = q.id;
 
-        AdminController.edit(mockRequest, mockResponse);
-      });
+        AdminController.edit(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('renders a 404 when the question is not found', function(done) {
@@ -129,7 +129,7 @@ describe('AdminController', function() {
       var mockResponse = this.createMockResponse('404', 404, null, null, done);
 
       mockRequest.params.id = 0;
-      AdminController.edit(mockRequest, mockResponse);
+      AdminController.edit(mockRequest, mockResponse, this.simpleCatch);
     })
   });
 
@@ -144,14 +144,14 @@ describe('AdminController', function() {
             expect(question.question).toEqual(mockRequest.body.question.question);
             expect(question.answers.length).toBe(2);
             done();
-          });
+          }).catch(self.simpleCatch);
         });
 
         mockRequest.params.id = question.id;
         mockRequest.body = createMockRequestBodyFromQuestion(question)
 
-        AdminController.update(mockRequest, mockResponse);
-      });
+        AdminController.update(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('creates an answer if the answer doesn\'t have an id', function(done) {
@@ -163,7 +163,7 @@ describe('AdminController', function() {
           Question.findById(question.id, { include: [Answer] }).then(function(question) {
             expect(question.answers.length).toBe(1);
             done();
-          });
+          }).catch(self.simpleCatch);
         });
 
         mockRequest.params.id = question.id;
@@ -172,8 +172,8 @@ describe('AdminController', function() {
           answers: [ { answer: 'Yes' } ]
         };
 
-        AdminController.update(mockRequest, mockResponse);
-      });
+        AdminController.update(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('deletes an answer if the answer has an id with empty answer', function(done) {
@@ -185,15 +185,15 @@ describe('AdminController', function() {
           Question.findById(question.id, { include: [Answer] }).then(function(question) {
             expect(question.answers.length).toBe(1);
             done();
-          });
+          }).catch(self.simpleCatch);
         });
 
         mockRequest.params.id = question.id;
         mockRequest.body = createMockRequestBodyFromQuestion(question);
         mockRequest.body.question.answers[0].answer = '';
 
-        AdminController.update(mockRequest, mockResponse);
-      });
+        AdminController.update(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('update an answer if the answer has an id with answer', function(done) {
@@ -206,15 +206,15 @@ describe('AdminController', function() {
             expect(question.answers.length).toBe(2);
             expect(question.answers[0].answer).toBe('A question?');
             done();
-          });
+          }).catch(self.simpleCatch);
         });
 
         mockRequest.params.id = question.id;
         mockRequest.body = createMockRequestBodyFromQuestion(question);
         mockRequest.body.question.answers[0].answer = 'A question?';
 
-        AdminController.update(mockRequest, mockResponse);
-      });
+        AdminController.update(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('renders admin/edit when invalid question', function(done) {
@@ -238,8 +238,8 @@ describe('AdminController', function() {
           ]
         };
 
-        AdminController.update(mockRequest, mockResponse);
-      });
+        AdminController.update(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('renders admin/edit when no answers submitted', function(done) {
@@ -262,8 +262,8 @@ describe('AdminController', function() {
           ]
         };
 
-        AdminController.update(mockRequest, mockResponse);
-      });
+        AdminController.update(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
 
     it('renders a 404 when question doesn\'t exist', function(done) {
@@ -279,7 +279,7 @@ describe('AdminController', function() {
         ]
       };
 
-      AdminController.update(mockRequest, mockResponse);
+      AdminController.update(mockRequest, mockResponse, this.simpleCatch);
     });
   });
 
@@ -292,12 +292,12 @@ describe('AdminController', function() {
           Question.findById(q.id).then(function(deletedQuestion) {
             expect(deletedQuestion).toBeNull();
             done();
-          });
+          }).catch(self.simpleCatch);
         });
 
         mockRequest.params.id = q.id;
-        AdminController.delete(mockRequest, mockResponse);
-      });
+        AdminController.delete(mockRequest, mockResponse, self.simpleCatch);
+      }).catch(this.simpleCatch);
     });
   });
 
@@ -306,13 +306,13 @@ describe('AdminController', function() {
       var mockRequest = this.createMockRequest();
       var mockResponse = this.createMockResponse('admin/login', 200, null, null, done);
 
-      AdminController.showLogin(mockRequest, mockResponse);
+      AdminController.showLogin(mockRequest, mockResponse, this.simpleCatch);
     });
   });
 
   describe('#login', function() {
     beforeEach(function(done) {
-      this.createDefaultAdmin().then(done);
+      this.createDefaultAdmin().then(done).catch(this.simpleCatch);
     });
 
     it('logs in and redirects with correct credentials', function(done) {
@@ -325,7 +325,7 @@ describe('AdminController', function() {
       mockRequest.body.email = 'user@example.com'
       mockRequest.body.password = 'password'
 
-      AdminController.login(mockRequest, mockResponse);
+      AdminController.login(mockRequest, mockResponse, this.simpleCatch);
     });
 
     it('renders the login form with invalid email', function(done) {
@@ -337,7 +337,7 @@ describe('AdminController', function() {
       mockRequest.body.email = 'wrongemail@example.com'
       mockRequest.body.password = 'password'
 
-      AdminController.login(mockRequest, mockResponse);
+      AdminController.login(mockRequest, mockResponse, this.simpleCatch);
     });
 
     it('renders the login form with wrong password', function(done) {
@@ -349,7 +349,7 @@ describe('AdminController', function() {
       mockRequest.body.email = 'user@example.com'
       mockRequest.body.password = 'wrong password'
 
-      AdminController.login(mockRequest, mockResponse);
+      AdminController.login(mockRequest, mockResponse, this.simpleCatch);
     });
   });
 });
