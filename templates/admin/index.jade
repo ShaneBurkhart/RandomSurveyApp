@@ -3,6 +3,8 @@ extends /layout.jade
 block content
     .card.admin
         h1 Questions
+        p
+            a(href="/admin/questions/new") + Create Question
         .questions
             each q, i in questions
                 p
