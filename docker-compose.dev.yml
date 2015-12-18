@@ -1,0 +1,33 @@
+data:
+    image: debian:wheezy
+    volumes:
+        - /var/lib/mysql
+    command: "true"
+
+web:
+    image: shaneburkhart/random-survey-app
+    links:
+        - mysql
+    volumes:
+        - .:/app
+    environment:
+        PORT: 3000
+    command: npm run nodemon -- -L ./server.js
+
+mysql:
+    image: mysql:5.6.25
+    environment:
+        MYSQL_ROOT_PASSWORD: password
+        MYSQL_DATABASE: mydb
+    volumes_from:
+        - data
+
+nginx:
+    image: nginx
+    ports:
+        - "3000:80"
+    links:
+        - web
+    volumes:
+        - ./nginx.conf:/etc/nginx/nginx.conf
+        - ./public:/public
