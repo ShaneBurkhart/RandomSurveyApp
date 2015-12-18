@@ -49,6 +49,11 @@ $(function() {
     answersContainer.html(createAnswersElements(question.answers));
   };
 
+  var showNoQuestionsMessage = function() {
+    answersContainer.empty();
+    questionElement.text('There aren\'t anymore survey questions.');
+  };
+
   answersContainer.on('click', 'p', function(e) {
     if(!canAnswer) {
       return;
@@ -69,7 +74,7 @@ $(function() {
       if(question !== null) {
         updateDOMWithQuestion(question);
       } else {
-        // Show message saying we are out of questions.
+        showNoQuestionsMessage();
       }
     }).fail(function() {
       // Show fail message
