@@ -62,6 +62,10 @@ adminRouter.post('/questions/:id/update', AdminController.update);
 adminRouter.post('/questions/:id/delete', AdminController.delete);
 app.use('/admin', adminRouter);
 
+app.use(function(req, res, next) {
+  res.status(404).render('404');
+});
+
 http.createServer(app).listen(process.env.PORT);
 
 module.exports = app;
