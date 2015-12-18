@@ -49,3 +49,5 @@ gulp.task('js', function() {
 gulp.task('js:watch', ['js'], function() {
   gulp.watch(config.scriptFiles, ['js']);
 });
+
+gulp.task('default', ['js', 'css', 'img']);
