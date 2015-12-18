@@ -1,0 +1,20 @@
+extends /layout.jade
+
+block content
+    .card
+        h1 New Question
+        form(action="/admin/questions" method="POST")
+            label(for="question[question]") Question
+            input(name="question[question]" type="text")
+
+            br
+            #answers-form-container
+                label(for="question[answers][]") Answer 1
+                input(name="question[answers][]" type="text")
+                
+            p
+                a(href="#" id="add-answer") + Add answer
+
+            br
+            input(type="submit" value="Create Question")
+                        
