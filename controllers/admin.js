@@ -9,7 +9,6 @@ var Admin = db.admin;
 
 var AdminController = {
   index: function(req, res) {
-    // Show all questions and have a link to a page that can create pages.
     Question.findAll().then(function(questions) {
       res.render('admin/index', {
         questions: questions
@@ -18,7 +17,6 @@ var AdminController = {
   },
 
   new: function(req, res) {
-    // Show form to create questions with answers.
     res.render('admin/new');
   },
 
@@ -27,72 +25,61 @@ var AdminController = {
     var questionText = getQuestionText(question);
     var answers = getAnswers(question);
 
-    if(!question || !questionText || !answers.length) {
-      res.render('admin/new', {
-        question: question
-      });
+    if(!isValidRequest(questionText, answers)) {
+      res.render('admin/new', { question: question });
       return;
     }
 
-    Question.create({ question: questionText }).then(function(question) {
-      return Promise.settle(createAnswerPromises(answers, question.id));
-    }).then(function() {
-      res.redirect('/admin/questions');
-    }).catch(this.simpleCatch);
+    Question.create({ question: questionText })
+      .then(createSaveAnswersForQuestionCallback(answers))
+      .then(createRedirectToIndexCallback(res));
   },
 
   edit: function(req, res) {
-    // Show edit of question.  On that page, there will be answer editing.
     var questionId = req.params.id;
 
-    Question.findById(questionId, { include: [Answer] }).then(function(question) {
-      if(question) {
+    createFindQuestionByIdCallback(questionId)()
+      .then(function(question) {
+        if(!question) {
+          res.status(404).render('404');
+          return;
+        }
+
         res.render('admin/edit', {
           question: question
         });
-      } else {
-        res.status(404).render('404');
-      }
-    })
+      });
   },
 
   update: function(req, res) {
+    var self = this;
     var questionId = req.params.id;
     var question = req.body.question;
     var questionText = getQuestionText(question);
     var answers = getAnswers(question);
 
-    if(!question || !questionText || !answers.length) {
-      res.render('admin/edit', {
-        question: question
-      });
+    if(!isValidRequest(questionText, answers)) {
+      res.render('admin/edit', { question: question });
       return;
     }
 
-    Question.findById(questionId, { include: [Answer] }).then(function(question) {
+    createFindQuestionByIdCallback(questionId)().then(function(question) {
       if(!question) {
         res.status(404).render('404');
         return;
       }
 
-      question.update({ question: questionText }).then(function() {
-        // We could do a diff of current answers and new ones but for the sake of simplicity,
-        // I'm just going to delete all answers and add the new ones.
-        return Answer.destroy({ where: { questionId: questionId } })
-      }).then(function() {
-        return Promise.settle(createAnswerPromises(answers, questionId));
-      }).then(function() {
-        res.redirect('/admin/questions');
-      });
+      return question.update({ question: questionText })
+        .then(createSaveAnswersForQuestionCallback(answers))
+        .then(createRedirectToIndexCallback(res));
     });
   },
 
   delete: function(req, res) {
     var questionId = req.params.id;
 
-    Question.destroy({ where: { id: questionId } }).then(function(rowsAffected) {
-      res.redirect('/admin/questions');
-    });
+    Question.destroy({ where: { id: questionId } })
+      .then(createRedirectToIndexCallback(res));
   },
 
   showLogin: function(req, res) {
@@ -103,53 +90,103 @@ var AdminController = {
     var email = req.body.email;
     var password = req.body.password;
 
-    Admin.findOne({ where: { email: email } }).then(function(a) {
-      if(a && a.comparePassword(password)) {
-        req.session.adminId = a.id;
-        res.redirect('/admin/questions');
-      } else {
-        res.render('admin/login', { admin: a });
-      }
-    });
+    Admin.findOne({ where: { email: email } })
+      .then(createAuthenticateAdminCallback(req, res, password))
   }
 };
 
+var createFindQuestionByIdCallback = function(questionId) {
+  return function() {
+    return Question.findById(questionId, { include: [Answer] });
+  }
+};
+
+var createSaveAnswersForQuestionCallback = function(answers) {
+  return function(question) {
+    return Promise.settle(createAnswerPromises(answers, question.id));
+  };
+};
+
+var createRedirectToIndexCallback = function(res) {
+  return function() {
+    res.redirect('/admin/questions');
+  };
+};
+
+var createAuthenticateAdminCallback = function(req, res, password) {
+  return function(admin) {
+    if(admin && admin.comparePassword(password)) {
+      req.session.adminId = admin.id;
+      res.redirect('/admin/questions');
+    } else {
+      res.render('admin/login', { admin: admin });
+    }
+  }
+}
+
+// Parses the question out of the data from the request body
 var getQuestionText = function(questionRequestBody) {
   if(questionRequestBody && questionRequestBody.question) {
     return questionRequestBody.question;
   }
-  return false;
+  return null;
 };
 
+// Parses the answers out of the data from the request body
 var getAnswers = function(questionRequestBody) {
   var answers = [];
-  var answer = null;
 
   if(questionRequestBody && questionRequestBody.answers) {
-    var requestAnswers = questionRequestBody.answers;
-    for(var i = 0; i < requestAnswers.length; i++) {
-      answer = requestAnswers[i];
-      if(answer) {
-        answers.push(answer);
+    var requestedAnswers = questionRequestBody.answers;
+
+    for(var i = 0; i < requestedAnswers.length; i++) {
+      if(requestedAnswers[i].answer) {
+        answers.push(requestedAnswers[i]);
       }
     }
   }
   return answers;
 }
 
+// TODO check that answers belong to that question. Someone could set the
+// id themselves.
+// Returns an array of promises to modify answers
 var createAnswerPromises = function(answers, questionId) {
   var answerPromises = [];
   var answer = null;
+  var promise = null;
 
   for(var i = 0; i < answers.length; i++) {
     answer = answers[i];
+    if(!answer) { continue; }
 
-    answerPromises.push(Answer.create({
-      answer: answer,
-      questionId: questionId
-    }));
+    if(answer.id) {
+      if(answer.answer) {
+        // Answer exists and needs to be updated.
+        promise = Answer.update({ answer: answer.answer }, {
+          where: { id: answer.id }
+        });
+      } else {
+        // Answer exists and needs to be deleted since it's blank
+        promise = Answer.destroy({ where: answer.id });
+      }
+    } else {
+      // Answer doens't exist and needs to be created
+      promise = Answer.create({
+        answer: answer.answer,
+        questionId: questionId
+      });
+    }
+
+    answerPromises.push(promise);
   }
+
   return answerPromises;
+}
+
+// Checks if the question and answers from the request are valid.
+var isValidRequest = function(question, answers) {
+  return question && answers.length;
 }
 
 module.exports = AdminController;

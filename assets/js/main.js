@@ -6,14 +6,18 @@ $(function() {
     e.preventDefault();
     var lastAnswerLabel = answersFormContainer.find('label').last();
     var nextAnswerNum = parseInt(lastAnswerLabel.text().trim().slice(-1)) + 1;
+    var nextAnswerIndex = nextAnswerNum - 1;
 
     if(!nextAnswerNum) {
       return;
     }
 
     answersFormContainer.append([
-      '<label for="question[answers][]">Answer ' + nextAnswerNum + '</label>',
-      '<input name="question[answers][]" type="text"></input>'
+      '<label for="question[answers][' + nextAnswerIndex + '][answer]">',
+        'Answer ' + nextAnswerNum,
+      '</label>',
+      '<input name="question[answers][' + nextAnswerIndex + '][answer]" type="text">',
+      '</input>'
     ].join(""));
   });
 

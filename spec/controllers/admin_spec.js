@@ -22,8 +22,8 @@ describe('AdminController', function() {
 
   describe('#index', function() {
     it('shows a list of questions', function(done) {
-      var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse('admin/index', 200, null, function(data) {
+      var mockRequest = this.createMockRequest();
+      var mockResponse = this.createMockResponse('admin/index', 200, null, function(data) {
         expect(data.questions.length).toBe(2);
       }, done);
 
@@ -33,8 +33,8 @@ describe('AdminController', function() {
 
   describe('#new', function() {
     it('renders admin/new', function(done) {
-      var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse('admin/new', 200, null, null, done);
+      var mockRequest = this.createMockRequest();
+      var mockResponse = this.createMockResponse('admin/new', 200, null, null, done);
 
       AdminController.new(mockRequest, mockResponse);
     });
@@ -42,23 +42,27 @@ describe('AdminController', function() {
 
   describe('#create', function() {
     it('creates a questions with answers and redirects to /admin/questions', function(done) {
+      var self = this;
       // Deleting all other questions and answers to ensure this created both.
       Promise.settle([
         Question.destroy({ where: {} }),
         Answer.destroy({ where: {} })
       ]).then(function() {
-        var mockRequest = createMockRequest();
-        var mockResponse = createMockResponse(null, 302, '/admin/questions', null, function() {
+        var mockRequest = self.createMockRequest();
+        var mockResponse = self.createMockResponse(null, 302, '/admin/questions', null, function() {
           Promise.settle([ Question.count(), Answer.count() ]).then(function(countPromises) {
             expect(countPromises[0].value()).toBe(1); // Question count
-            expect(countPromises[1].value()).toBe(3); // Answer count
+            expect(countPromises[1].value()).toBe(2); // Answer count
+            done();
           });
-          done();
         });
 
         mockRequest.body.question = {
           question: 'My name is Ron Burgundy?',
-          answers: [ 'Yes', 'No', 'maybe' ]
+          answers: [
+            { answer: 'Yes' },
+            { answer: 'No' }
+          ]
         };
 
         AdminController.create(mockRequest, mockResponse);
@@ -66,25 +70,28 @@ describe('AdminController', function() {
     });
 
     it('renders admin/new when invalid question', function(done) {
-      var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse('admin/new', 200, null, function(data) {
+      var mockRequest = this.createMockRequest();
+      var mockResponse = this.createMockResponse('admin/new', 200, null, function(data) {
         expect(data.question).not.toBeUndefined();
         expect(data.question.question).not.toBeUndefined();
         expect(data.question.answers).not.toBeUndefined();
-        expect(data.question.answers.length).toBe(3);
+        expect(data.question.answers.length).toBe(2);
       }, done);
 
       mockRequest.body.question = {
         question: '',
-        answers: [ 'Yes', 'No', 'maybe' ]
+        answers: [
+          { answer: 'Yes' },
+          { answer: 'No' }
+        ]
       };
 
       AdminController.create(mockRequest, mockResponse);
     });
 
     it('renders admin/new when no answers submitted', function(done) {
-      var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse('admin/new', 200, null, function(data) {
+      var mockRequest = this.createMockRequest();
+      var mockResponse = this.createMockResponse('admin/new', 200, null, function(data) {
         expect(data.question).not.toBeUndefined();
         expect(data.question.question).not.toBeUndefined();
         expect(data.question.answers).not.toBeUndefined();
@@ -101,9 +108,11 @@ describe('AdminController', function() {
 
   describe('#edit', function() {
     it('renders admin/edit', function(done) {
+      var self = this;
+
       Question.findOne().then(function(q) {
-        var mockRequest = createMockRequest();
-        var mockResponse = createMockResponse('admin/edit', 200, null, function(data) {
+        var mockRequest = self.createMockRequest();
+        var mockResponse = self.createMockResponse('admin/edit', 200, null, function(data) {
           expect(data.question).not.toBeUndefined();
           expect(data.question).not.toBeNull();
           expect(data.question.id).toBe(q.id);
@@ -116,8 +125,8 @@ describe('AdminController', function() {
     });
 
     it('renders a 404 when the question is not found', function(done) {
-      var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse('404', 404, null, null, done);
+      var mockRequest = this.createMockRequest();
+      var mockResponse = this.createMockResponse('404', 404, null, null, done);
 
       mockRequest.params.id = 0;
       AdminController.edit(mockRequest, mockResponse);
@@ -126,40 +135,44 @@ describe('AdminController', function() {
 
   describe('#update', function() {
     it('updates question and answers then redirects to /admin/questions', function(done) {
-      Question.findOne().then(function(question) {
-        var mockRequest = createMockRequest();
-        var mockResponse = createMockResponse(null, 302, '/admin/questions', null, function() {
+      var self = this;
+
+      Question.findOne({ include: [ Answer ] }).then(function(question) {
+        var mockRequest = self.createMockRequest();
+        var mockResponse = self.createMockResponse(null, 302, '/admin/questions', null, function() {
           Question.findById(question.id, { include: [Answer] }).then(function(question) {
             expect(question.question).toEqual(mockRequest.body.question.question);
-            expect(question.answers.length).toBe(3);
+            expect(question.answers.length).toBe(2);
             done();
           });
         });
 
         mockRequest.params.id = question.id;
-        mockRequest.body.question = {
-          question: "New question?",
-          answers: [ 'Some', 'New', 'Answers' ]
-        };
+        mockRequest.body = createMockRequestBodyFromQuestion(question)
 
         AdminController.update(mockRequest, mockResponse);
       });
     });
 
     it('renders admin/edit when invalid question', function(done) {
+      var self = this;
+
       Question.findOne().then(function(question) {
-        var mockRequest = createMockRequest();
-        var mockResponse = createMockResponse('admin/edit', 200, null, function(data) {
+        var mockRequest = self.createMockRequest();
+        var mockResponse = self.createMockResponse('admin/edit', 200, null, function(data) {
           expect(data.question).not.toBeUndefined();
           expect(data.question.question).not.toBeUndefined();
           expect(data.question.answers).not.toBeUndefined();
-          expect(data.question.answers.length).toBe(3);
+          expect(data.question.answers.length).toBe(2);
         }, done);
 
         mockRequest.params.id = 0;
         mockRequest.body.question = {
           question: '',
-          answers: [ 'Yes', 'No', 'maybe' ]
+          answers: [
+            { answer: 'Yes' },
+            { answer: 'No' }
+          ]
         };
 
         AdminController.update(mockRequest, mockResponse);
@@ -167,9 +180,11 @@ describe('AdminController', function() {
     });
 
     it('renders admin/edit when no answers submitted', function(done) {
+      var self = this;
+
       Question.findOne().then(function(question) {
-        var mockRequest = createMockRequest();
-        var mockResponse = createMockResponse('admin/edit', 200, null, function(data) {
+        var mockRequest = self.createMockRequest();
+        var mockResponse = self.createMockResponse('admin/edit', 200, null, function(data) {
           expect(data.question).not.toBeUndefined();
           expect(data.question.question).not.toBeUndefined();
           expect(data.question.answers).not.toBeUndefined();
@@ -186,13 +201,16 @@ describe('AdminController', function() {
     });
 
     it('renders a 404 when question doesn\'t exist', function(done) {
-      var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse('404', 404, null, null, done);
+      var mockRequest = this.createMockRequest();
+      var mockResponse = this.createMockResponse('404', 404, null, null, done);
 
       mockRequest.params.id = 0;
       mockRequest.body.question = {
         question: 'My name is Ron Burgundy?',
-        answers: [ 'Yes', 'No', 'maybe' ]
+        answers: [
+          { answer: 'Yes' },
+          { answer: 'No' }
+        ]
       };
 
       AdminController.update(mockRequest, mockResponse);
@@ -201,9 +219,10 @@ describe('AdminController', function() {
 
   describe('#delete', function() {
     it('deletes the question and redirects to /admin/questions', function(done) {
+      var self = this;
       Question.findOne().then(function(q) {
-        var mockRequest = createMockRequest();
-        var mockResponse = createMockResponse(null, 302, '/admin/questions', null, function() {
+        var mockRequest = self.createMockRequest();
+        var mockResponse = self.createMockResponse(null, 302, '/admin/questions', null, function() {
           Question.findById(q.id).then(function(deletedQuestion) {
             expect(deletedQuestion).toBeNull();
             done();
@@ -218,8 +237,8 @@ describe('AdminController', function() {
 
   describe('#showLogin', function() {
     it('renders the login form', function(done) {
-      var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse('admin/login', 200, null, null, done);
+      var mockRequest = this.createMockRequest();
+      var mockResponse = this.createMockResponse('admin/login', 200, null, null, done);
 
       AdminController.showLogin(mockRequest, mockResponse);
     });
@@ -231,8 +250,8 @@ describe('AdminController', function() {
     });
 
     it('logs in and redirects with correct credentials', function(done) {
-      var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse(null, 302, '/admin/questions', null, function() {
+      var mockRequest = this.createMockRequest();
+      var mockResponse = this.createMockResponse(null, 302, '/admin/questions', null, function() {
         expect(mockRequest.session.adminId).not.toBeUndefined();
         done();
       });
@@ -244,8 +263,8 @@ describe('AdminController', function() {
     });
 
     it('renders the login form with invalid email', function(done) {
-      var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse('admin/login', 200, null, function(data) {
+      var mockRequest = this.createMockRequest();
+      var mockResponse = this.createMockResponse('admin/login', 200, null, function(data) {
         expect(data.admin).not.toBeUndefined();
       }, done);
 
@@ -256,8 +275,8 @@ describe('AdminController', function() {
     });
 
     it('renders the login form with wrong password', function(done) {
-      var mockRequest = createMockRequest();
-      var mockResponse = createMockResponse('admin/login', 200, null, function(data) {
+      var mockRequest = this.createMockRequest();
+      var mockResponse = this.createMockResponse('admin/login', 200, null, function(data) {
         expect(data.admin).not.toBeUndefined();
       }, done);
 
@@ -269,37 +288,20 @@ describe('AdminController', function() {
   });
 });
 
-var createMockRequest = function() {
-  return {
-    params: {},
-    body: {},
-    session: {}
-  };
-}
+var createMockRequestBodyFromQuestion = function(question) {
+  var body = { question: {
+      question: question.question,
+      answers: []
+    } };
 
-var createMockResponse = function(expectedView, expectedStatus, redirectUrl, checkData, done) {
-  return {
-    statusCode: 200,
-
-    status: function(code) {
-      this.statusCode = code;
-      return this;
-    },
-
-    render: function(view, data) {
-      expect(view).toEqual(expectedView);
-      expect(this.statusCode).toEqual(expectedStatus);
-      if(checkData) {
-        checkData(data);
-      }
-      done();
-    },
-
-    redirect: function(path) {
-      this.status(302);
-      expect(this.statusCode).toEqual(expectedStatus);
-      expect(path).toEqual(redirectUrl);
-      done();
-    }
-  };
-}
+  var answers = question.answers;
+  var answer = null;
+  for(var i = 0; i < answers.length; i++) {
+    answer = answers[i];
+    body.question.answers.push({
+      id: answers,
+      answer: answer.answer
+    });
+  }
+  return body;
+};

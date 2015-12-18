@@ -12,8 +12,9 @@ block content
                 if question.answers
                     #answers-form-container
                         each a, i in question.answers
-                            label(for="question[answers][]") Answer #{i+1}
-                            input(name="question[answers][]" type="text" value="#{a.answer}")
+                            input(name="question[answers][#{i}][id]" type="hidden" value="#{a.id}")
+                            label(for="question[answers][#{i}][answer]") Answer #{i+1}
+                            input(name="question[answers][#{i}][answer]" type="text" value="#{a.answer}")
                         
                     p
                         a(href="#" id="add-answer") + Add answer
