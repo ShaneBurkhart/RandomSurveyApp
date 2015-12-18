@@ -6,13 +6,11 @@ var Question = db.question;
 var Answer = db.answer;
 
 beforeEach(function() {
-  this.checkQuestionIsNotValid = function(q, done) {
-      Question.create({
-        question: q
-      }).then(function(q) {
-        expect(q).toBeUndefined();
-        done();
-      }).catch(this.createCheckHasErrorsCallback(done));
+  this.checkQuestionIsNotValid = function(question, done) {
+    this.createQuestion(question).then(function(q) {
+      expect(q).toBeUndefined();
+      done();
+    }).catch(this.createCheckHasErrorsCallback(done));
   };
 
   this.createDefaultQuestionWithAnswers = function() {
