@@ -2,6 +2,7 @@
 
 html, body {
     font-family: Roboto, Arial, Sans-Serif;
+    font-size: 14px;
     background-color: #eeeeee;
     background-image: url("/img/background.png");
     background-repeat: repeat;
@@ -71,6 +72,10 @@ table {
             cursor: pointer;
         }
     }
+}
+
+p.red {
+    color: #e60000;
 }
 
 @media (max-width: 780px) {
