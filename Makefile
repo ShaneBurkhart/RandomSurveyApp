@@ -29,7 +29,11 @@ mysql: migrate
 	docker-compose run --rm mysql mysql --user=root --password=password --host=mysql --database=mydb
 
 test:
-	docker-compose run --rm web npm test
+	docker-compose -f docker-compose.test.yml -p survey-test up -d
+	echo "Wait for db to start."
+	sleep 6
+	docker-compose -f docker-compose.test.yml -p survey-test run web npm run sequelize db:migrate
+	docker-compose -f docker-compose.test.yml -p survey-test run --rm web npm test
 
 migrate: start
 	docker-compose run web npm run sequelize db:migrate
