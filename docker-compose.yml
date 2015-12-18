@@ -8,8 +8,6 @@ web:
     image: shaneburkhart/random-survey-app
     links:
         - mysql
-    volumes:
-        - .:/app
     environment:
         PORT: 3000
     command: npm start
@@ -23,11 +21,8 @@ mysql:
         - data
 
 nginx:
-    image: nginx
+    image: shaneburkhart/random-survey-app-nginx
     ports:
         - "3000:80"
     links:
         - web
-    volumes:
-        - ./nginx.conf:/etc/nginx/nginx.conf
-        - ./public:/public
