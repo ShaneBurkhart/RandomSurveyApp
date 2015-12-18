@@ -9,7 +9,7 @@ block content
 
         form(action="/admin/questions" method="POST")
             label(for="question[question]") Question
-            input(name="question[question]" type="text")
+            input(name="question[question]" type="text" value="#{question.question}")
 
             br
             #answers-form-container

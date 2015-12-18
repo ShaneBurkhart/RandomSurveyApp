@@ -17,7 +17,12 @@ var AdminController = {
   },
 
   new: function(req, res) {
-    res.render('admin/new');
+    // We pass in empty data to make it easy to render data the user submitted
+    // when update fails.
+    res.render('admin/new', { question: {
+      question: '',
+      answers: []
+    } });
   },
 
   create: function(req, res) {
