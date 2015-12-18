@@ -2,7 +2,20 @@ extends /layout.jade
 
 block content
     .card
-        h1 Edit Question
+        h2 Question Stats    
+        p This question has been asked #{question.timesAnswered} times
+        table
+            tr
+                th Answer
+                th Times Answered
+            if question.answers
+                each a, i in question.answers
+                    tr
+                        td= a.answer
+                        td= a.timesAnswered
+
+    .card
+        h2 Edit Question
         form(action="/admin/questions/#{question.id}/update" method="POST")
             label(for="question[question]") Question
             input(name="question[question]" type="text" value="#{question.question}")
