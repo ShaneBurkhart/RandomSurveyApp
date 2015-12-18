@@ -12,7 +12,7 @@ web:
         - .:/app
     environment:
         PORT: 3000
-    command: npm run nodemon -- -L ./server.js
+    command: npm start
 
 mysql:
     image: mysql:5.6.25
