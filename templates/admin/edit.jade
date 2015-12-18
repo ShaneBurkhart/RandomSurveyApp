@@ -1,0 +1,23 @@
+extends /layout.jade
+
+block content
+    .card
+        h1 Edit Question
+        form(action="/admin/questions/#{question.id}/update" method="POST")
+            label(for="question[question]") Question
+            input(name="question[question]" type="text" value="#{question.question}")
+
+            br
+            if question
+                if question.answers
+                    #answers-form-container
+                        each a, i in question.answers
+                            label(for="question[answers][]") Answer #{i+1}
+                            input(name="question[answers][]" type="text" value="#{a.answer}")
+                        
+                    p
+                        a(href="#" id="add-answer") + Add answer
+
+            br
+            input(type="submit" value="Update Question")
+                        
