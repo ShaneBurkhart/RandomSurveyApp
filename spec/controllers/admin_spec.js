@@ -256,7 +256,10 @@ describe('AdminController', function() {
         mockRequest.params.id = 0;
         mockRequest.body.question = {
           question: 'My name is Ron Burgundy?',
-          answers: null
+          answers: [
+            { answer: '' },
+            { answer: '' }
+          ]
         };
 
         AdminController.update(mockRequest, mockResponse);

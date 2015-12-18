@@ -25,8 +25,9 @@ var AdminController = {
     var questionText = getQuestionText(question);
     var answers = getAnswers(question);
 
-    if(!isValidRequest(questionText, answers)) {
-      res.render('admin/new', { question: question });
+    var error = getRequestError(questionText, answers);
+    if(error) {
+      res.render('admin/new', { error: error, question: question });
       return;
     }
 
@@ -58,8 +59,9 @@ var AdminController = {
     var questionText = getQuestionText(question);
     var answers = getAnswers(question);
 
-    if(!isValidRequest(questionText, answers)) {
-      res.render('admin/edit', { question: question });
+    var error = getRequestError(questionText, answers);
+    if(error) {
+      res.render('admin/edit', { error: error, question: question });
       return;
     }
 
@@ -179,8 +181,21 @@ var createAnswerPromises = function(answers, questionId) {
 }
 
 // Checks if the question and answers from the request are valid.
-var isValidRequest = function(question, answers) {
-  return question && answers.length;
-}
+var getRequestError = function(question, answers) {
+  if(!question) {
+    return "You need to have a question.";
+  }
+
+  if(answers.length) {
+    for(var i = 0; i < answers.length; i++) {
+      if(answers[i].answer) {
+        return null;
+      }
+    }
+    return "You need to have at least one question.";
+  } else {
+    return "You need to have at least one question.";
+  }
+};
 
 module.exports = AdminController;
