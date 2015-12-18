@@ -3,6 +3,8 @@ extends /layout.jade
 block content
     .card
         h2 New Question
+        p
+            a(href="/admin/questions") Back
         p.red Any answers left blank will be deleted.
         if error
             p.red= error
