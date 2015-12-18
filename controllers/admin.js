@@ -134,18 +134,10 @@ var getQuestionText = function(questionRequestBody) {
 
 // Parses the answers out of the data from the request body
 var getAnswers = function(questionRequestBody) {
-  var answers = [];
-
   if(questionRequestBody && questionRequestBody.answers) {
-    var requestedAnswers = questionRequestBody.answers;
-
-    for(var i = 0; i < requestedAnswers.length; i++) {
-      if(requestedAnswers[i].answer) {
-        answers.push(requestedAnswers[i]);
-      }
-    }
+    return questionRequestBody.answers;
   }
-  return answers;
+  return [];
 }
 
 // TODO check that answers belong to that question. Someone could set the
@@ -168,7 +160,9 @@ var createAnswerPromises = function(answers, questionId) {
         });
       } else {
         // Answer exists and needs to be deleted since it's blank
-        promise = Answer.destroy({ where: answer.id });
+        promise = Answer.destroy({ where: {
+          id: answer.id
+        } });
       }
     } else {
       // Answer doens't exist and needs to be created

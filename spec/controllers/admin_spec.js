@@ -154,6 +154,69 @@ describe('AdminController', function() {
       });
     });
 
+    it('creates an answer if the answer doesn\'t have an id', function(done) {
+      var self = this;
+
+      this.createDefaultQuestion().then(function(question) {
+        var mockRequest = self.createMockRequest();
+        var mockResponse = self.createMockResponse(null, 302, '/admin/questions', null, function() {
+          Question.findById(question.id, { include: [Answer] }).then(function(question) {
+            expect(question.answers.length).toBe(1);
+            done();
+          });
+        });
+
+        mockRequest.params.id = question.id;
+        mockRequest.body.question = {
+          question: question.question,
+          answers: [ { answer: 'Yes' } ]
+        };
+
+        AdminController.update(mockRequest, mockResponse);
+      });
+    });
+
+    it('deletes an answer if the answer has an id with empty answer', function(done) {
+      var self = this;
+
+      Question.findOne({ include: [ Answer ] }).then(function(question) {
+        var mockRequest = self.createMockRequest();
+        var mockResponse = self.createMockResponse(null, 302, '/admin/questions', null, function() {
+          Question.findById(question.id, { include: [Answer] }).then(function(question) {
+            expect(question.answers.length).toBe(1);
+            done();
+          });
+        });
+
+        mockRequest.params.id = question.id;
+        mockRequest.body = createMockRequestBodyFromQuestion(question);
+        mockRequest.body.question.answers[0].answer = '';
+
+        AdminController.update(mockRequest, mockResponse);
+      });
+    });
+
+    it('update an answer if the answer has an id with answer', function(done) {
+      var self = this;
+
+      Question.findOne({ include: [ Answer ] }).then(function(question) {
+        var mockRequest = self.createMockRequest();
+        var mockResponse = self.createMockResponse(null, 302, '/admin/questions', null, function() {
+          Question.findById(question.id, { include: [Answer] }).then(function(question) {
+            expect(question.answers.length).toBe(2);
+            expect(question.answers[0].answer).toBe('A question?');
+            done();
+          });
+        });
+
+        mockRequest.params.id = question.id;
+        mockRequest.body = createMockRequestBodyFromQuestion(question);
+        mockRequest.body.question.answers[0].answer = 'A question?';
+
+        AdminController.update(mockRequest, mockResponse);
+      });
+    });
+
     it('renders admin/edit when invalid question', function(done) {
       var self = this;
 
@@ -299,7 +362,7 @@ var createMockRequestBodyFromQuestion = function(question) {
   for(var i = 0; i < answers.length; i++) {
     answer = answers[i];
     body.question.answers.push({
-      id: answers,
+      id: answer.id,
       answer: answer.answer
     });
   }
