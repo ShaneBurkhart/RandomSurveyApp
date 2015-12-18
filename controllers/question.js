@@ -6,69 +6,97 @@ var Promise = Sequelize.Promise;
 var Question = db.question;
 var Answer = db.answer;
 
+var COOKIE_DURATION = 5 * 365 * 24 * 60 * 60 * 1000; // 5 years
+
 var QuestionController = {
   // Shows a random survey question that the user has not seen yet.
   show: function(req, res) {
     var alreadySeen = req.cookies.alreadySeen || [];
-    findRandomQuestion(alreadySeen).then(function(q) {
-      if(q) {
-        q.getAnswers().then(function(answers) {
-          q.answers = answers;
-          res.render('question/show', { question: q });
-        });
-      } else {
-          res.render('question/show', { question: q });
-      }
-    });
+
+    createFindRandomQuestionIdCallback()(alreadySeen)
+      .then(createFindQuestionWithAnswersByIdCallback())
+      .then(createRenderQuestionCallback(function(data) {
+        res.render('question/show', data);
+      }));
   },
 
   answer: function(req, res) {
     var questionId = req.params.id;
     var answerId = parseInt(req.body.answerId);
 
-    Question.findById(questionId, {
-      include: [db.answer]
-    }).then(function(q) {
-      // Checking if answerId is NaN
-      if(!q || !answerId || !questionHasAnswerId(q, answerId)) {
-        res.status(404).json({});
-        return;
-      }
-
-      updateStats(questionId, answerId).then(function() {
-        var alreadySeen = req.cookies.alreadySeen || [];
-        alreadySeen.push(questionId);
-        res.cookie('alreadySeen', alreadySeen, {
-          maxAge: 5 * 365 * 24 * 60 * 60 * 1000, // 5 years
-          httpOnly: true
-        });
-
-        return findRandomQuestion(alreadySeen);
-      }).then(function(newQ) {
-        if(newQ) {
-          newQ.getAnswers().then(function(answers) {
-            newQ.answers = answers;
-            res.json({ question: newQ });
-          });
-        } else {
-            res.json({ question: newQ });
+    createFindQuestionWithAnswersByIdCallback()(questionId)
+      .then(function(question) {
+        // Checking if answerId is NaN
+        if(!question || !answerId || !questionHasAnswerId(question, answerId)) {
+          res.status(404).json({});
+          return;
         }
+
+        createUpdateStatsCallback(questionId, answerId)()
+          .then(createUpdateAlreadySeenCallback(questionId, req, res))
+          .then(createFindRandomQuestionIdCallback())
+          .then(createFindQuestionWithAnswersByIdCallback())
+          // Since we are passing a function, it doesn't have any reference of 'this'
+          // bind sets this to the mockResponse
+          .then(createRenderQuestionCallback(res.json.bind(res)))
       });
-    })
   }
 }
 
-var updateStats = function(qId, aId) {
-  return Promise.settle([
-    Question.update(
-      { timesAnswered: Sequelize.literal('timesAnswered+1') },
-      { where: { id: qId } }
-    ),
-    Answer.update(
-      { timesAnswered: Sequelize.literal('timesAnswered+1') },
-      { where: { id: aId } }
-    )
-  ]);
+var createFindRandomQuestionIdCallback = function() {
+  return function(alreadySeen) {
+    return Question.findAll(
+      getOptionsForFindAllIdsNotSeen(alreadySeen)
+    ).then(function(questions) {
+      if(questions.length == 0) {
+        return null;
+      }
+      var index = randomInt(0, questions.length);
+      return questions[index].id;
+    });
+  };
+};
+
+var createUpdateStatsCallback = function(qId, aId) {
+  return function() {
+    return Promise.settle([
+      Question.update(
+        { timesAnswered: Sequelize.literal('timesAnswered+1') },
+        { where: { id: qId } }
+      ),
+      Answer.update(
+        { timesAnswered: Sequelize.literal('timesAnswered+1') },
+        { where: { id: aId } }
+      )
+    ]);
+  };
+};
+
+var createUpdateAlreadySeenCallback = function(questionId, req, res) {
+  return function() {
+    return new Promise(function(resolve, reject) {
+      var alreadySeen = req.cookies.alreadySeen || [];
+      alreadySeen.push(questionId);
+
+      res.cookie('alreadySeen', alreadySeen, {
+        maxAge: COOKIE_DURATION,
+        httpOnly: true
+      });
+      resolve(alreadySeen);
+    })
+  };
+};
+
+var createFindQuestionWithAnswersByIdCallback = function() {
+  return function(questionId) {
+    return Question.findById(questionId, { include: [ Answer ] })
+  };
+};
+
+var createRenderQuestionCallback = function(renderFunc) {
+  return function(question) {
+    renderFunc({ question: question });
+  };
 };
 
 var questionHasAnswerId = function(question, answerId) {
@@ -80,20 +108,10 @@ var questionHasAnswerId = function(question, answerId) {
   return false;
 };
 
-var findRandomQuestion = function(alreadySeen) {
-  return Question.findAll(
-    getOptionsForFindAllIdsNotSeen(alreadySeen)
-  ).then(function(questions) {
-    if(questions.length == 0) {
-      return null;
-    }
-    var index = randomInt(0, questions.length);
-    return questions[index];
-  });
-};
-
 var getOptionsForFindAllIdsNotSeen = function(alreadySeen) {
-  var findAllOptions = {};
+  // Only get ids for speed purposes.  We can requery for the whole question and
+  // include the answer.
+  var findAllOptions = { attributes: [ 'id' ] };
   if(alreadySeen.length > 0) {
     findAllOptions.where = {
       id: { $notIn: alreadySeen }
