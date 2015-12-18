@@ -16,6 +16,10 @@ block content
 
     .card
         h2 Edit Question
+        p.red Any answers left blank will be deleted.
+        if error
+            p.red= error
+
         form(action="/admin/questions/#{question.id}/update" method="POST")
             label(for="question[question]") Question
             input(name="question[question]" type="text" value="#{question.question}")
