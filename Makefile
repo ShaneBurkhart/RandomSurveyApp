@@ -39,9 +39,13 @@ mysql: start
 	docker-compose run --rm mysql mysql --user=root --password=password --host=mysql --database=mydb
 
 test:
+	docker create --name="temporary-survey-app" ${BASE_TAG}
+	docker cp temporary-survey-app:/app/bower_components ./bower_components
+	docker cp temporary-survey-app:/app/node_modules ./node_modules
+	docker rm temporary-survey-app
 	docker-compose -f ${TEST_DOCKER_COMPOSE_FILE} -p survey-test up -d
 	echo "Wait for db to start."
-	sleep 6
+	sleep 10
 	docker-compose -f ${TEST_DOCKER_COMPOSE_FILE} -p survey-test run web npm run sequelize db:migrate
 	docker-compose -f ${TEST_DOCKER_COMPOSE_FILE} -p survey-test run --rm web npm test
 
