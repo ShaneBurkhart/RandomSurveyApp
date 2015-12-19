@@ -14,7 +14,9 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function(models) {
-        Question.hasMany(models.answer);
+        Question.hasMany(models.answer, {
+          onDelete: "CASCADE",
+        });
       }
     }
   });
