@@ -68,6 +68,29 @@ The tests are run in a docker container that is isolated from the rest of the ap
 make test
 ```
 
+## Other Tasks
+
+### MySQL Console
+
+```
+make mysql
+```
+
+### Logs
+
+```
+make logs
+```
+
+### Clean
+
+This stops and removes all running containers.  This is good to start fresh with you setup.  Sometimes, in dev,
+you will make a change that screwed something up.  It's really easy to just clean everything and run `make` again.
+
+```
+make clean
+```
+
 ## Common Issues
 
 #### Database isn't ready yet.
@@ -75,3 +98,14 @@ make test
 The makefile starts the app as a daemon so we have to wait for the database to come up before running migrations and seeding.
 This takes different amounts of time depending on your machine.  In the makefile, there is a 10 second wait for the db, but
 that isn't always long enough. To fix this, just run `make` again.
+
+#### DNS Lookup Error.
+
+I have no idea how to explain this issue but it only happens on Mac.  Occasionally, the server just won't work because the mysql
+instance says it can't find the lookup for DNS.  You can check this is the case by running `make logs`.  To fix it, you just need
+to restart you docker-machin VM:
+
+```
+docker-machine restart <machine-name>
+eval $(docker-machine env <machine-name>)
+```

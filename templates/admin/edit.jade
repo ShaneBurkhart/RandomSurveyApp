@@ -18,6 +18,10 @@ block content
 
     .card
         h2 Edit Question
+
+        form(action="/admin/questions/#{question.id}/delete" method="POST")
+            input(type="submit" value="Delete Question")
+
         p.red Any answers left blank will be deleted.
         if error
             p.red= error
