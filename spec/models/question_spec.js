@@ -5,7 +5,7 @@ var db = require('../../models/db.js');
 var Answer = db.answer;
 describe('Question', function() {
   it('saves a record correctly', function(done) {
-    this.createDefaultQuestion().then(function(q) {
+    this.createDefaultQuestionWithAnswers().then(function(q) {
       expect(q.isNewRecord).toBe(false);
       done();
     }).catch(this.createCheckHasNoErrorsCallback(done));

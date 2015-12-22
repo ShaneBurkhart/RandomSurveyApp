@@ -157,11 +157,11 @@ describe('AdminController', function() {
     it('creates an answer if the answer doesn\'t have an id', function(done) {
       var self = this;
 
-      this.createDefaultQuestion().then(function(question) {
+      this.createDefaultQuestionWithAnswers().then(function(question) {
         var mockRequest = self.createMockRequest();
         var mockResponse = self.createMockResponse(null, 302, '/admin/questions', null, function() {
           Question.findById(question.id, { include: [Answer] }).then(function(question) {
-            expect(question.answers.length).toBe(1);
+            expect(question.answers.length).toBe(3);
             done();
           }).catch(self.simpleCatch);
         });
