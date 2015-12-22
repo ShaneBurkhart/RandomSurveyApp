@@ -10,6 +10,7 @@ web:
         - mysql
     environment:
         PORT: 3000
+        NODE_ENV: "production"
     command: npm start
 
 mysql:
