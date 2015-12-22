@@ -6,6 +6,12 @@ NGINX_BASE_TAG=shaneburkhart/random-survey-app-nginx
 DOCKER_COMPOSE_FILE?=docker-compose.yml
 TEST_DOCKER_COMPOSE_FILE?=docker-compose.test.yml
 
+no_docker:
+	npm run gulp
+	npm run sequelize db:migrate
+	npm run sequelize db:seed
+	LOCAL_ASSETS=1 npm start
+
 build:
 	docker build -t ${BASE_TAG} .
 	docker run -v $(shell pwd)/public:/app/public ${BASE_TAG} npm run gulp

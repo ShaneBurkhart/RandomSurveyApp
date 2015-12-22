@@ -1,14 +1,26 @@
 {
   "development": {
-    "url": "mysql://root:password@mysql:3306/mydb",
+    "database": "mydb",
+    "username": "root",
+    "password": "password",
+    "host": "localhost",
+    "port": "3306",
     "dialect": "mysql"
   },
   "test": {
-    "url": "mysql://root:password@mysql:3306/mydb",
+    "database": "mydb",
+    "username": "root",
+    "password": "password",
+    "host": "localhost",
+    "port": "3306",
     "dialect": "mysql"
   },
   "production": {
-    "url": "mysql://root:password@mysql:3306/mydb",
+    "database": "mydb",
+    "username": "root",
+    "password": "password",
+    "host": "localhost",
+    "port": "3306",
     "dialect": "mysql"
   }
 }

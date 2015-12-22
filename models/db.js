@@ -8,7 +8,19 @@ var env       = process.env.NODE_ENV || 'development';
 var config    = require(__dirname + '/../config/config.json')[env];
 var db        = {};
 
-var sequelize = new Sequelize(config["url"], { logging: false });
+var database = process.env.DATABASE || config['database'];
+var user = process.env.DB_USER || config['username'];
+var password = process.env.DB_PASSWORD || config['password'];
+var host = process.env.DB_HOST || config['host'];
+var port = process.env.DB_PORT || config['port'];
+var dialect = process.env.DB_DIALECT || config['dialect'];
+
+var sequelize = new Sequelize(database, user, password, {
+  host: host,
+  dialect: dialect,
+  port: port,
+  logging: false
+});
 
 fs
   .readdirSync(__dirname)

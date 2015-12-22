@@ -8,4 +8,6 @@ RUN npm install
 
 EXPOSE 3000
 
+ENV DB_HOST "mysql"
+
 CMD ["npm", "start"]
