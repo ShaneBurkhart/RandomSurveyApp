@@ -5,7 +5,6 @@ ADD . /app
 WORKDIR /app
 
 RUN npm install
-RUN npm run bower -- --allow-root install
 
 EXPOSE 3000
 
