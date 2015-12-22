@@ -26,10 +26,10 @@ $(function() {
   var questionElement = $('h2#question');
   var canAnswer = true;
 
-  var createAnswerElement = function(answer) {
+  var createAnswerElement = function(index, answer) {
     answerElement = $('<p>');
     answerElement.data('aid', answer.id);
-    answerElement.html(answer.answer);
+    answerElement.html(index + '. ' + answer.answer);
     return answerElement;
   };
 
@@ -37,7 +37,7 @@ $(function() {
     answerElements= [];
     if(answers !== undefined) {
       for(var i = 0; i < answers.length; i++) {
-        answerElements.push(createAnswerElement(answers[i]));
+        answerElements.push(createAnswerElement(i + 1, answers[i]));
       }
     }
     return answerElements;
