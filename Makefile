@@ -21,8 +21,8 @@ start:
 	docker-compose -f ${DOCKER_COMPOSE_FILE} up -d
 	echo "Wait for db to start."
 	sleep 10
-	docker-compose -f ${DOCKER_COMPOSE_FILE} run web npm run sequelize db:migrate
-	docker-compose -f ${DOCKER_COMPOSE_FILE} run web npm run sequelize db:seed
+	docker-compose -f ${DOCKER_COMPOSE_FILE} run web npm run sequelize -- --config=config/config.docker.json db:migrate
+	docker-compose -f ${DOCKER_COMPOSE_FILE} run web npm run sequelize -- --config=config/config.docker.json db:seed
 
 restart: clean start
 
