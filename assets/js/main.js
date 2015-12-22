@@ -68,7 +68,7 @@ $(function() {
       '/question/' + questionId + '/answer',
       { answerId: answerId }
     ).done(function(data) {
-      // Show a success message and show a new question
+      // Show a new question
       var question = data.question;
 
       if(question !== null) {
@@ -77,7 +77,7 @@ $(function() {
         showNoQuestionsMessage();
       }
     }).fail(function() {
-      // Show fail message
+      alert('There was a problem when submitting your answer.  Please try again later.');
     }).always(function() {
       canAnswer = true;
     });
