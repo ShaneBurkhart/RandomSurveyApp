@@ -31,6 +31,12 @@ app.use(function(err, req, res, next) {
   res.status(500).render('500');
 });
 
+// Only allow express to server static assets if we aren't running in
+// docker.  With docker, nginx serves up assets for speed.
+if(process.env.LOCAL_ASSETS) {
+  app.use(express.static('public'));
+}
+
 app.get('/', QuestionController.show);
 app.post('/question/:id/answer', QuestionController.answer);
 
@@ -66,6 +72,6 @@ app.use(function(req, res, next) {
   res.status(404).render('404');
 });
 
-http.createServer(app).listen(process.env.PORT);
+http.createServer(app).listen(process.env.PORT || 3000);
 
 module.exports = app;
