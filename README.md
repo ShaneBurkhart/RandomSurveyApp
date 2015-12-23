@@ -2,7 +2,13 @@
 
 An app that presents random survey questions to the user and records the results.
 
-## Running The App Without Docker
+## Admin Page
+
+To log in as an admin, visit the `/admin` page.
+
+The database is seeded with an admin that has `admin@surveyapp.com` as the email and `password` as the password.
+
+## Without Docker
 
 If you want to use docker to run the app, scroll down to the "Requirements To Run The App With Docker" section.  Everything after that section uses docker.
 
@@ -18,33 +24,29 @@ npm install
 
 ### Running
 
-For running, we use `make` instead of `npm`.  To see why, see the next section.
+**Before running the app, you need to change the config/config.json file to match your
+database setup.**  This allows migrations and seeders to connect to the database.
 
 ```
-make no_docker
+npm start
 ```
 
-#### Why Not Use Npm Instead Of Make?
-
-Npm isn't as nice for running multiple commands.  The `scrips` portion of package.json allows for only one command in `prestart` and `start`.  We could
-string together commands with `&&` but this is ugly.
-
-If we change the `prestart` or `start` scripts, we would have to wait for 10 seconds as to not break the docker setup.  This isn't ideal considering we
-know the databaseserver is up when running locally.
+Visit the app at `http://localhost:3000`
 
 ### Running Tests
 
-Running tests will pollute the database with duplicate questions.  This is allowed but makes for an awkward UX.  When you answer a question and a
-duplicate question is returned, it appears that nothing has changed when in fact a new question has been shown.
+**Running the tests will delete all questions from the database.**
 
 ```
 npm test
 ```
 
 
-## Requirements To Run The App With Docker
+## With Docker
 
-**Everything after and including this section uses docker.**
+**Everything in this section uses docker.**
+
+### Requirements
 
 The app uses docker and docker-compose to make it easy to run anywhere.  Depending on your OS, the installation will be different.
 
@@ -54,13 +56,7 @@ To install docker-compose, follow [this guide](https://docs.docker.com/compose/i
 
 To make running tasks easier, `make` is also used.  Most OS's come with `make` already installed.
 
-## Pull The App
-
-```
-git clone https://github.com/ShaneBurkhart/RandomSurveyApp.git
-```
-
-## Building Containers
+### Building Containers
 
 Before running anything, you need to build the docker containers.
 
@@ -70,7 +66,7 @@ This process takes a while due to installing npm and bower dependencies:
 make build
 ```
 
-## Running The App
+### Running The App
 
 After the build has succeeded, run the app with:
 
@@ -80,7 +76,7 @@ make
 
 This starts the app on port 3000;
 
-### On Mac
+#### On Mac
 
 Mac uses a Linux VM to run docker containers.  To view the app in the browser, you need to know what the IP of the VM is:
 
@@ -92,17 +88,11 @@ The default machine name is `default`.
 
 Now visit `http://<vm-ip-address>:3000`
 
-### On Linux
+#### On Linux
 
 Linux can use docker natively so you can simply view `http://localhost:3000`
 
-## Admin Page
-
-To log in as an admin, visit the `/admin` page.
-
-`make` seeds the database with an admin that has `admin@surveyapp.com` as the email and `password` as the password.
-
-## Running Tests
+### Running Tests
 
 The tests are run in a docker container that is isolated from the rest of the app.  You can run the tests with:
 
@@ -110,21 +100,21 @@ The tests are run in a docker container that is isolated from the rest of the ap
 make test
 ```
 
-## Other Tasks
+### Other Tasks
 
-### MySQL Console
+#### MySQL Console
 
 ```
 make mysql
 ```
 
-### Logs
+#### Logs
 
 ```
 make logs
 ```
 
-### Clean
+#### Clean
 
 This stops and removes all running containers.  This is good to start fresh with you setup.  Sometimes, in dev,
 you will make a change that screwed something up.  It's really easy to just clean everything and run `make` again.
@@ -133,7 +123,7 @@ you will make a change that screwed something up.  It's really easy to just clea
 make clean
 ```
 
-## Common Issues
+### Common Issues
 
 #### Database isn't ready yet.
 
