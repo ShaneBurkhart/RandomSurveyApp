@@ -10,7 +10,7 @@ The database is seeded with an admin that has `admin@surveyapp.com` as the email
 
 ## Without Docker
 
-If you want to use docker to run the app, scroll down to the "Requirements To Run The App With Docker" section.  Everything after that section uses docker.
+If you want to use docker to run the app, scroll down to the "With Docker" section.  Everything after that section uses docker.
 
 This section assumes you have `npm`, `make`, and `mysql` installed with mysql already running.
 
