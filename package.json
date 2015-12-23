@@ -4,6 +4,8 @@
   "description": "An app that presents a random survey question to the user.",
   "scripts": {
     "postinstall": "bower install --allow-root",
+    "prestart": "make prestart",
+    "start": "LOCAL_ASSETS=1 node server.js",
     "sequelize": "sequelize",
     "jasmine": "jasmine",
     "test": "jasmine",
