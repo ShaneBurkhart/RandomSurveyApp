@@ -52,7 +52,7 @@ test:
 	echo "Wait for db to start."
 	sleep 10
 	docker-compose -f ${TEST_DOCKER_COMPOSE_FILE} -p survey-test run web npm run sequelize -- --config=config/config.docker.json db:migrate
-	docker-compose -f ${TEST_DOCKER_COMPOSE_FILE} -p survey-test run --rm web npm test
+	docker-compose -f ${TEST_DOCKER_COMPOSE_FILE} -p survey-test run --rm web npm run -- jasmine
 
 migration:
 ifdef NAME
