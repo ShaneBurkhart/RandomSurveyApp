@@ -1,7 +1,9 @@
 'use strict'
 
 var app = require('../../server.js');
+var db = require('../../models/db.js');
 var session = require('supertest-session');
+var Question = db.question;
 
 var testSession = null;
 var question = null;
@@ -28,7 +30,11 @@ describe('Admin routes', function() {
   });
 
   beforeEach(function(done) {
-    this.createDefaultQuestionWithAnswers().then(function(q) {
+    var self = this;
+
+    Question.destroy({ where: {} }).then(function() {
+      return self.createDefaultQuestionWithAnswers();
+    }).then(function(q) {
       question = q;
       done();
     });

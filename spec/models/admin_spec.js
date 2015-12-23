@@ -3,8 +3,13 @@
 var db = require('../../models/db.js');
 
 var Admin = db.admin;
+var Question = db.question;
 
 describe('Admin', function() {
+  beforeEach(function(done) {
+    Question.destroy({ where: {} }).then(done);
+  });
+
   it('saves a record correctly', function(done) {
     this.createDefaultAdmin().then(function(a) {
       expect(a.isNewRecord).toBe(false);

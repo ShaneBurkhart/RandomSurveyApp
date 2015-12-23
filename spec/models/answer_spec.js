@@ -5,6 +5,10 @@ var Answer = db.answer;
 var Question = db.question;
 
 describe('Answer', function() {
+  beforeEach(function(done) {
+    Question.destroy({ where: {} }).then(done);
+  });
+
   it('saves a record correctly', function(done) {
     this.createDefaultAnswer(1).then(function(a) {
       expect(a.isNewRecord).toBe(false);
