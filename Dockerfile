@@ -10,4 +10,7 @@ EXPOSE 3000
 
 ENV DB_HOST "mysql"
 
-CMD ["npm", "start"]
+# We can't use npm start since that is set up to run the app
+# with a local mysql instance and serve static assets through
+# express.
+CMD ["node", "server.js"]
