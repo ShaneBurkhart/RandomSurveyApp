@@ -4,7 +4,7 @@ MAINTAINER Shane Burkhart <shaneburkhart@gmail.com>
 ADD . /app
 WORKDIR /app
 
-RUN npm install
+RUN npm install --unsafe-perm=true
 
 EXPOSE 3000
 
