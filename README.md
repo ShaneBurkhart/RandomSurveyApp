@@ -35,7 +35,7 @@ Visit the app at `http://localhost:3000`
 
 ### Running Tests
 
-**Running the tests will delete all questions from the database.**
+**Make sure the config/config.json matches your database setup.**
 
 ```
 npm test

@@ -8,7 +8,8 @@
     "start": "LOCAL_ASSETS=1 node server.js",
     "sequelize": "sequelize",
     "jasmine": "jasmine",
-    "test": "jasmine",
+    "pretest": "NODE_ENV=test make prestart",
+    "test": "NODE_ENV=test jasmine",
     "bower": "bower",
     "gulp": "gulp",
     "nodemon": "nodemon"
