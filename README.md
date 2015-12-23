@@ -2,7 +2,49 @@
 
 An app that presents random survey questions to the user and records the results.
 
-## Requirements
+## Running The App Without Docker
+
+If you want to use docker to run the app, scroll down to the "Requirements To Run The App With Docker" section.  Everything after that section uses docker.
+
+This section assumes you have `npm`, `make`, and `mysql` installed with mysql already running.
+
+### Installing
+
+Install with npm.
+
+```
+npm install
+```
+
+### Running
+
+For running, we use `make` instead of `npm`.  To see why, see the next section.
+
+```
+make no_docker
+```
+
+#### Why Not Use Npm Instead Of Make?
+
+Npm isn't as nice for running multiple commands.  The `scrips` portion of package.json allows for only one command in `prestart` and `start`.  We could
+string together commands with `&&` but this is ugly.
+
+If we change the `prestart` or `start` scripts, we would have to wait for 10 seconds as to not break the docker setup.  This isn't ideal considering we
+know the databaseserver is up when running locally.
+
+### Running Tests
+
+Running tests will pollute the database with duplicate questions.  This is allowed but makes for an awkward UX.  When you answer a question and a
+duplicate question is returned, it appears that nothing has changed when in fact a new question has been shown.
+
+```
+npm test
+```
+
+
+## Requirements To Run The App With Docker
+
+**Everything after and including this section uses docker.**
 
 The app uses docker and docker-compose to make it easy to run anywhere.  Depending on your OS, the installation will be different.
 
